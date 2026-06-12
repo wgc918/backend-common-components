@@ -1,0 +1,1441 @@
+# =============================================================================
+# Clang Format 配置文件 - C/C++ 项目
+# =============================================================================
+# 此文件定义了 backend-common-components 项目的代码格式化规则。
+# 每个配置项都包含以下说明：
+#   - 功能：该选项的作用
+#   - 取值：可接受的取值范围
+#   - 默认值：未指定时的默认值
+#   - 用途：该设置在项目中的具体应用场景
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 基础配置
+# -----------------------------------------------------------------------------
+
+# 指定格式化的语言。决定应用哪些语法规则。
+# 取值：Cpp, C, Java, JavaScript, JSON, ObjectiveC, Proto, TableGen, TextProto
+# 默认值：Cpp
+# 用途：我们的项目使用 C++17，因此设置为 Cpp 以启用 C++ 特定规则。
+Language: Cpp
+
+# -----------------------------------------------------------------------------
+# 对齐选项
+# -----------------------------------------------------------------------------
+
+# 控制开括号后的续行对齐方式。
+# 取值：Align（与开括号对齐）, DontAlign（不特殊对齐）,
+#       AlwaysBreak（总是在开括号后换行）, BlockIndent（缩进续行）
+# 默认值：Align
+# 用途：设置为 true/Align 以在函数调用和初始化器中保持一致的垂直对齐。
+AlignAfterOpenBracket: true
+
+# 控制访问修饰符（public、private、protected）的缩进偏移。
+# 取值：整数（负值表示减少缩进，正值表示增加缩进）
+# 默认值：0
+# 用途：设置为 0 使访问修饰符与类内其他内容同级别缩进。
+AccessModifierOffset: -4
+
+# 控制结构体数组的对齐方式。
+# 取值：Left（每行首元素对齐）, Right（每行末元素对齐）
+# 默认值：Left
+# 用途：Left 对齐在我们的数据结构中更易读。
+AlignArrayOfStructures: Left
+
+# -----------------------------------------------------------------------------
+# 连续对齐选项
+# 这些选项控制连续语句/声明的对齐。
+# -----------------------------------------------------------------------------
+
+# 控制连续赋值语句的对齐。
+# Enabled：如果为 true，对齐连续行的赋值运算符。
+# AcrossEmptyLines：如果为 true，跨空行继续对齐。
+# AcrossComments：如果为 true，跨仅注释行继续对齐。
+# AlignCompound：如果为 true，对齐复合赋值如 +=、-=。
+# AlignFunctionDeclarations：如果为 true，对齐函数声明。
+# AlignFunctionPointers：如果为 true，对齐函数指针赋值。
+# PadOperators：如果为 true，在运算符周围添加空格以提高可读性。
+# 默认值：Enabled: false
+# 用途：启用此选项可提高配置代码中相关赋值的可读性。
+AlignConsecutiveAssignments:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCompound: false
+  AlignFunctionDeclarations: false
+  AlignFunctionPointers: false
+  PadOperators: true
+
+# Controls alignment of consecutive bit field declarations.
+# 与 AlignConsecutiveAssignments 类似的选项。
+# 默认值：Enabled: false
+# 用途：启用此选项以对齐结构体定义中的位域宽度。
+AlignConsecutiveBitFields:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCompound: false
+  AlignFunctionDeclarations: false
+  AlignFunctionPointers: false
+  PadOperators: false
+
+# 控制连续声明的对齐。
+# 与 AlignConsecutiveAssignments 类似的选项。
+# 默认值：Enabled: false
+# 用途：启用此选项以对齐相似类型的变量声明。
+AlignConsecutiveDeclarations:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCompound: false
+  AlignFunctionDeclarations: false
+  AlignFunctionPointers: false
+  PadOperators: false
+
+# 控制连续宏定义的对齐。
+# 与 AlignConsecutiveAssignments 类似的选项。
+# 默认值：Enabled: false
+# 用途：启用此选项以对齐相关的宏常量。
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCompound: false
+  AlignFunctionDeclarations: false
+  AlignFunctionPointers: false
+  PadOperators: false
+
+# 控制 switch 中连续短 case 语句的对齐。
+# Enabled：如果为 true，对齐短 case 语句。
+# AlignCaseArrows：如果为 true，对齐现代 C++ 中的 case 箭头。
+# AlignCaseColons：如果为 true，对齐 case 冒号。
+# 默认值：Enabled: false
+# 用途：禁用以保持传统 case 语句格式。
+AlignConsecutiveShortCaseStatements:
+  Enabled: false
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCaseArrows: false
+  AlignCaseColons: false
+
+# TableGen 特定的对齐选项 - 在我们的 C++ 项目中禁用。
+AlignConsecutiveTableGenBreakingDAGArgColons:
+  Enabled: false
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCompound: false
+  AlignFunctionDeclarations: false
+  AlignFunctionPointers: false
+  PadOperators: false
+
+AlignConsecutiveTableGenCondOperatorColons:
+  Enabled: false
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCompound: false
+  AlignFunctionDeclarations: false
+  AlignFunctionPointers: false
+  PadOperators: false
+
+AlignConsecutiveTableGenDefinitionColons:
+  Enabled: false
+  AcrossEmptyLines: false
+  AcrossComments: false
+  AlignCompound: false
+  AlignFunctionDeclarations: false
+  AlignFunctionPointers: false
+  PadOperators: false
+
+# 控制转义换行符的对齐。
+# 取值：Left（与行首对齐）, Right（与列限制对齐）, DontAlign
+# 默认值：DontAlign
+# 用途：Left 对齐提高长字符串字面量的可读性。
+AlignEscapedNewlines: Left
+
+# 控制表达式中操作数的对齐。
+# 取值：Align（对齐操作数）, DontAlign（不特殊对齐）,
+#       AlwaysBreak（在运算符前换行）
+# 默认值：Align
+# 用途：对齐操作数以提高复杂表达式的可读性。
+AlignOperands: Align
+
+# 控制尾随注释的对齐。
+# AlignPPAndNotPP：如果为 true，同时对齐预处理和非预处理注释。
+# Kind：Always（始终对齐）, Never（从不对齐）, EmptyLines（仅跨空行）
+# OverEmptyLines：对齐时跨越的最大空行数。
+# 默认值：AlignPPAndNotPP: true, Kind: Always, OverEmptyLines: 0
+# 用途：对齐尾随注释使代码外观更整洁。
+AlignTrailingComments:
+  AlignPPAndNotPP: true
+  Kind: Always
+  OverEmptyLines: 0
+
+# -----------------------------------------------------------------------------
+# 允许选项
+# -----------------------------------------------------------------------------
+
+# 如果为 true，当函数参数不适合当前行时，允许所有参数放在下一行。
+# 默认值：true
+# 用途：启用此选项以提高函数调用格式化的灵活性。
+AllowAllArgumentsOnNextLine: true
+
+# 如果为 true，允许函数声明中的所有参数放在下一行。
+# 默认值：true
+# 用途：启用此选项以支持复杂的函数声明。
+AllowAllParametersOfDeclarationOnNextLine: true
+
+# 控制是否在 noexcept 说明符前换行。
+# 取值：Always, Never, MultiLine
+# 默认值：Never
+# 用途：Never 在 noexcept 前不换行，保持函数签名紧凑。
+AllowBreakBeforeNoexceptSpecifier: Never
+
+# 如果为 true，允许在 Qt 属性声明前换行。
+# 默认值：false
+# 用途：禁用，因为我们的项目不使用 Qt。
+AllowBreakBeforeQtProperty: false
+
+# 控制短块是否可以放在单行。
+# 取值：Never, Empty（仅空块）, All（所有短块）
+# 默认值：Never
+# 用途：Never 不允许，以保持一致的块结构。
+AllowShortBlocksOnASingleLine: Empty
+
+# 如果为 true，允许短 case 表达式放在单行。
+# 默认值：false
+# 用途：启用此选项以支持简洁的枚举式 switch case。
+AllowShortCaseExpressionOnASingleLine: true
+
+# 如果为 true，允许短 case 标签放在单行。
+# 默认值：false
+# 用途：禁用以提高 switch 语句的可读性。
+AllowShortCaseLabelsOnASingleLine: false
+
+# 如果为 true，允许短复合要求放在单行。
+# 默认值：true
+# 用途：启用此选项以支持 C++20 中的简洁 concepts。
+AllowShortCompoundRequirementOnASingleLine: true
+
+# 如果为 true，允许短枚举定义放在单行。
+# 默认值：true
+# 用途：启用此选项以支持简单的枚举定义。
+AllowShortEnumsOnASingleLine: true
+
+# 控制短函数是否可以放在单行。
+# 取值：None（从不）, Inline（仅内联函数）,
+#       Empty（仅空函数）, All（所有短函数）
+# 默认值：None
+# 用途：None 保持函数定义格式一致，所有函数体都换行。
+AllowShortFunctionsOnASingleLine: None
+
+# 控制短 if 语句是否可以放在单行。
+# 取值：Never, WithoutElse, All
+# 默认值：Never
+# 用途：WithoutElse 允许无 else 的单行 if，提高简洁性。
+AllowShortIfStatementsOnASingleLine: Never
+
+# 控制短 lambda 是否可以放在单行。
+# 取值：None, Empty, All
+# 默认值：None
+# 用途：All 允许简洁的 lambda 表达式。
+AllowShortLambdasOnASingleLine: All
+
+# 如果为 true，允许短循环语句放在单行。
+# 默认值：false
+# 用途：禁用此选项以强制循环体换行，提高可读性。
+AllowShortLoopsOnASingleLine: false
+
+# 如果为 true，允许短命名空间放在单行。
+# 默认值：false
+# 用途：禁用以保持命名空间结构。
+AllowShortNamespacesOnASingleLine: false
+
+# -----------------------------------------------------------------------------
+# 总是换行选项
+# -----------------------------------------------------------------------------
+
+# 控制函数定义中返回类型后的换行。
+# 取值：None, All, TopLevel（仅顶级函数）
+# 默认值：None
+# 用途：None 保持函数定义紧凑。
+AlwaysBreakAfterDefinitionReturnType: None
+
+# 如果为 true，总是在多行字符串字面量前换行。
+# 默认值：false
+# 用途：启用此选项以防止字符串拼接导致的超长行。
+AlwaysBreakBeforeMultilineStrings: true
+
+# -----------------------------------------------------------------------------
+# 属性宏
+# -----------------------------------------------------------------------------
+
+# 应被视为属性的宏列表。
+# 用途：这些宏是现代 C++ 项目中常见的注解属性。
+AttributeMacros:
+  - __capability
+  - absl_nonnull
+  - absl_nullable
+  - absl_nullability_unknown
+
+# -----------------------------------------------------------------------------
+# 参数装箱选项
+# -----------------------------------------------------------------------------
+
+# 如果为 true，将函数调用参数打包到尽可能少的行中。
+# 默认值：true
+# 用途：启用此选项以支持紧凑的函数调用。
+BinPackArguments: true
+
+# 如果为 true，将长大括号列表打包到尽可能少的行中。
+# 默认值：true
+# 用途：启用此选项以支持紧凑的初始化列表。
+BinPackLongBracedList: true
+
+# 控制函数参数的打包方式。
+# 取值：BinPack（打包到少数行）, Always（从不换行）, Never（总是换行）
+# 默认值：BinPack
+# 用途：BinPack 在紧凑性和可读性之间取得平衡。
+BinPackParameters: BinPack
+
+# -----------------------------------------------------------------------------
+# 位域选项
+# -----------------------------------------------------------------------------
+
+# 控制位域声明中冒号周围的空格。
+# 取值：None, Before, After, Both
+# 默认值：Both
+# 用途：Both 在位域定义中提供清晰的分隔。
+BitFieldColonSpacing: Both
+
+# -----------------------------------------------------------------------------
+# 大括号选项
+# -----------------------------------------------------------------------------
+
+# 控制大括号初始化器的缩进宽度。
+# 取值：-1（使用 IndentWidth）, 正整数（指定宽度）
+# 默认值：-1
+# 用途：-1 使用标准缩进宽度。
+BracedInitializerIndentWidth: -1
+
+# 控制大括号如何跨行换行。
+# AfterCaseLabel：如果为 true，在 case 标签后换行。
+# AfterClass：如果为 true，在类开括号后换行。
+# AfterControlStatement：Never/Always/MultiLine - 控制语句后换行。
+# AfterEnum：如果为 true，在枚举开括号后换行。
+# AfterExternBlock：如果为 true，在 extern 块开括号后换行。
+# AfterFunction：如果为 true，在函数开括号后换行。
+# AfterNamespace：如果为 true，在命名空间开括号后换行。
+# AfterObjCDeclaration：如果为 true，在 ObjC 声明后换行。
+# AfterStruct：如果为 true，在结构体开括号后换行。
+# AfterUnion：如果为 true，在联合体开括号后换行。
+# BeforeCatch：如果为 true，在 catch 块前换行。
+# BeforeElse：如果为 true，在 else 块前换行。
+# BeforeLambdaBody：如果为 true，在 lambda 体前换行。
+# BeforeWhile：如果为 true，在 do-while 的 while 前换行。
+# IndentBraces：如果为 true，缩进大括号本身。
+# SplitEmptyFunction：如果为 true，将空函数体拆分为单独的行。
+# SplitEmptyRecord：如果为 true，将空记录体拆分为单独的行。
+# SplitEmptyNamespace：如果为 true，将空命名空间体拆分为单独的行。
+# 默认值：除 SplitEmptyFunction/Record/Namespace 为 true 外，其余均为 false。
+# 用途：保持大括号附着（K&R 风格）以实现紧凑代码。
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: Always
+  AfterEnum: true
+  AfterExternBlock: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterObjCDeclaration: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeLambdaBody: false
+  BeforeWhile: false
+  IndentBraces: false
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+  SplitEmptyNamespace: true
+
+# -----------------------------------------------------------------------------
+# 换行选项
+# -----------------------------------------------------------------------------
+
+# 如果为 true，将相邻的字符串字面量分割到单独的行。
+# 默认值：false
+# 用途：启用此选项以防止超长的拼接字符串。
+BreakAdjacentStringLiterals: true
+
+# 控制属性后的换行。
+# 取值：Leave（保持在同一行）, Always（总是换行）, Never（从不换行）
+# 默认值：Leave
+# 用途：Leave 保持属性与其声明在一起。
+BreakAfterAttributes: Leave
+
+# 如果为 true，在 Java 字段注解后换行（不适用于 C++）。
+# 默认值：false
+BreakAfterJavaFieldAnnotations: false
+
+# 如果为 true，在大括号列表的开括号后换行。
+# 默认值：false
+# 用途：禁用以支持紧凑的初始化列表。
+BreakAfterOpenBracketBracedList: false
+
+# 如果为 true，在函数调用的开括号后换行。
+# 默认值：false
+# 用途：禁用以支持紧凑的函数调用。
+BreakAfterOpenBracketFunction: false
+
+# 如果为 true，在 if 语句的开括号后换行。
+# 默认值：false
+# 用途：禁用以支持紧凑的 if 语句。
+BreakAfterOpenBracketIf: false
+
+# 如果为 true，在循环语句的开括号后换行。
+# 默认值：false
+# 用途：禁用以支持紧凑的循环语句。
+BreakAfterOpenBracketLoop: false
+
+# 如果为 true，在 switch 语句的开括号后换行。
+# 默认值：false
+# 用途：禁用以支持紧凑的 switch 语句。
+BreakAfterOpenBracketSwitch: false
+
+# 控制函数声明中返回类型后的换行。
+# 取值：None, All, TopLevel, AllDefinitions, TopLevelDefinitions
+# 默认值：None
+# 用途：None 保持函数声明紧凑。
+BreakAfterReturnType: None
+
+# 如果为 true，当数组字面量不适合一行时换行。
+# 默认值：false
+# 用途：启用此选项以支持长数组初始化器。
+BreakArrays: true
+
+# 控制二元运算符前的换行。
+# 取值：None（在运算符后换行）, NonAssignment（在非赋值运算符前换行）,
+#       All（在所有二元运算符前换行）
+# 默认值：None
+# 用途：None 将运算符保持在行末（传统风格）。
+BreakBeforeBinaryOperators: None
+
+# 如果为 true，在大括号列表的闭括号前换行。
+# 默认值：false
+# 用途：禁用以支持紧凑格式化。
+BreakBeforeCloseBracketBracedList: false
+
+# 如果为 true，在函数调用的闭括号前换行。
+# 默认值：false
+# 用途：禁用以支持紧凑格式化。
+BreakBeforeCloseBracketFunction: false
+
+# 如果为 true，在 if 语句的闭括号前换行。
+# 默认值：false
+# 用途：禁用以支持紧凑格式化。
+BreakBeforeCloseBracketIf: false
+
+# 如果为 true，在循环语句的闭括号前换行。
+# 默认值：false
+# 用途：禁用以支持紧凑格式化。
+BreakBeforeCloseBracketLoop: false
+
+# 如果为 true，在 switch 语句的闭括号前换行。
+# 默认值：false
+# 用途：禁用以支持紧凑格式化。
+BreakBeforeCloseBracketSwitch: false
+
+# 控制 concepts 声明前的换行。
+# 取值：Always, Never
+# 默认值：Always
+# 用途：Always 换行以提高 concept 约束的可读性。
+BreakBeforeConceptDeclarations: Always
+
+# 控制大括号相对于语句的位置。
+# 取值：Attach（K&R 风格）, Linux（类似 Attach）,
+#       Mozilla, Stroustrup, Allman（BSD 风格）, GNU
+# 默认值：Attach
+# 用途：Allman（BSD 风格），大括号单独占一行，提高可读性。
+BreakBeforeBraces: Allman
+
+# 控制内联汇编中冒号前的换行。
+# 取值：OnlyMultiline, Always, Never
+# 默认值：OnlyMultiline
+# 用途：OnlyMultiline 在内联汇编中最小化换行。
+BreakBeforeInlineASMColon: OnlyMultiline
+
+# 如果为 true，在模板闭合尖括号前换行。
+# 默认值：false
+# 用途：禁用以保持模板声明紧凑。
+BreakBeforeTemplateCloser: false
+
+# 如果为 true，在三元运算符（?:）前换行。
+# 默认值：false
+# 用途：启用此选项以提高复杂三元表达式的可读性。
+BreakBeforeTernaryOperators: true
+
+# 控制二元操作的换行。
+# 取值：Never, All, NonAssignment
+# 默认值：Never
+# 用途：Never 保持传统格式。
+BreakBinaryOperations: Never
+
+# 控制构造函数初始化器的换行。
+# 取值：BeforeColon, AfterColon, AfterComma, BeforeComma
+# 默认值：BeforeColon
+# 用途：BeforeColon 清晰分隔构造函数和初始化器。
+BreakConstructorInitializers: BeforeColon
+
+# 如果为 true，当函数定义参数不适合时换行。
+# 默认值：false
+# 用途：禁用以保持函数定义紧凑。
+BreakFunctionDefinitionParameters: false
+
+# 控制继承列表的换行。
+# 取值：BeforeColon, AfterColon, AfterComma, BeforeComma
+# 默认值：BeforeColon
+# 用途：BeforeColon 清晰分隔类名和基类。
+BreakInheritanceList: BeforeColon
+
+# 如果为 true，拆分长字符串字面量。
+# 默认值：true
+# 用途：启用此选项以防止超长行。
+BreakStringLiterals: true
+
+# 控制模板声明的换行。
+# 取值：No, Yes, Always
+# 默认值：No
+# 用途：Yes 拆分长模板声明。
+BreakTemplateDeclarations: Yes
+
+# -----------------------------------------------------------------------------
+# 列选项
+# -----------------------------------------------------------------------------
+
+# 格式化换行前的最大行宽。
+# 取值：正整数，0（无限制）
+# 默认值：80
+# 用途：80 列用于传统可读性和兼容性。
+ColumnLimit: 100
+
+# 不应重新格式化的特殊注释的正则表达式。
+# 用途：保留 IWYU（Include What You Use）编译指示。
+CommentPragmas: "^ IWYU pragma:"
+
+# -----------------------------------------------------------------------------
+# 紧凑选项
+# -----------------------------------------------------------------------------
+
+# 如果为 true，将嵌套命名空间合并为单个块。
+# 默认值：false
+# 用途：禁用以保持显式的命名空间层次结构。
+CompactNamespaces: false
+
+# -----------------------------------------------------------------------------
+# 构造函数选项
+# -----------------------------------------------------------------------------
+
+# 控制构造函数初始化器的缩进宽度。
+# 取值：正整数
+# 默认值：4
+# 用途：4 个空格清晰缩进初始化列表。
+ConstructorInitializerIndentWidth: 4
+
+# -----------------------------------------------------------------------------
+# 续行选项
+# -----------------------------------------------------------------------------
+
+# 控制续行的缩进宽度。
+# 取值：正整数
+# 默认值：4
+# 用途：4 个空格清晰缩进续行。
+ContinuationIndentWidth: 4
+
+# -----------------------------------------------------------------------------
+# C++11 选项
+# -----------------------------------------------------------------------------
+
+# 控制 C++11 大括号列表的格式。
+# 取值：true（每个元素后换行）, false（紧凑）,
+#       AlignFirstComment（与第一个注释对齐）
+# 默认值：true
+# 用途：AlignFirstComment 提高带注释的可读性。
+Cpp11BracedListStyle: AlignFirstComment
+
+# -----------------------------------------------------------------------------
+# 推导选项
+# -----------------------------------------------------------------------------
+
+# 如果为 true，从 DerivePointerAlignmentStyle 推导指针对齐方式。
+# 默认值：true
+# 用途：禁用此选项以显式设置 PointerAlignment。
+DerivePointerAlignment: false
+
+# -----------------------------------------------------------------------------
+# 禁用选项
+# -----------------------------------------------------------------------------
+
+# 如果为 true，完全禁用格式化。
+# 默认值：false
+# 用途：false 启用格式化。
+DisableFormat: false
+
+# -----------------------------------------------------------------------------
+# 空行选项
+# -----------------------------------------------------------------------------
+
+# 控制访问修饰符后的空行。
+# 取值：Never, Always, Leave
+# 默认值：Never
+# 用途：Never 保持类定义紧凑。
+EmptyLineAfterAccessModifier: Never
+
+# 控制访问修饰符前的空行。
+# 取值：Never, Always, LogicalBlock
+# 默认值：LogicalBlock
+# 用途：LogicalBlock 仅在逻辑块之间添加空行。
+EmptyLineBeforeAccessModifier: LogicalBlock
+
+# -----------------------------------------------------------------------------
+# 枚举选项
+# -----------------------------------------------------------------------------
+
+# 控制枚举声明中的尾随逗号。
+# 取值：Leave（保持原样）, Always（缺失时添加）, Never（移除）
+# 默认值：Leave
+# 用途：Leave 保持现有风格。
+EnumTrailingComma: Leave
+
+# -----------------------------------------------------------------------------
+# 实验性选项
+# -----------------------------------------------------------------------------
+
+# 如果为 true，启用实验性的自动检测装箱功能。
+# 默认值：false
+# 用途：禁用此选项以确保格式化结果可预测。
+ExperimentalAutoDetectBinPacking: false
+
+# -----------------------------------------------------------------------------
+# 修复选项
+# -----------------------------------------------------------------------------
+
+# 如果为 true，添加缺失的命名空间闭合注释。
+# 默认值：false
+# 用途：启用此选项以保持正确的命名空间文档。
+FixNamespaceComments: true
+
+# -----------------------------------------------------------------------------
+# 宏选项
+# -----------------------------------------------------------------------------
+
+# 应被视为 foreach 循环的宏列表。
+# 用途：支持常见的 foreach 宏模式。
+ForEachMacros:
+  - foreach
+  - Q_FOREACH
+  - BOOST_FOREACH
+
+# 应被视为 if 语句的宏列表。
+# 用途：支持条件宏模式。
+IfMacros:
+  - KJ_IF_MAYBE
+
+# -----------------------------------------------------------------------------
+# 头文件包含选项
+# -----------------------------------------------------------------------------
+
+# 控制 include 块的分组方式。
+# 取值：Preserve（保持原样）, Merge（合并所有）, Regroup（按类别重新分组）
+# 默认值：Preserve
+# 用途：Regroup 按优先级组织 includes。
+IncludeBlocks: Regroup
+
+# 定义 include 排序的类别。
+# Regex：匹配 include 路径的正则表达式。
+# Priority：排序优先级（值越小越靠前）。
+# SortPriority：同一优先级内的次要排序优先级。
+# CaseSensitive：如果为 true，区分大小写排序。
+# 用途：标准 include 顺序：系统头文件（<...>）在项目头文件（"..."）之前。
+IncludeCategories:
+  - Regex: '^<ext/.*\.h>'
+    Priority: 2
+    SortPriority: 0
+    CaseSensitive: false
+  - Regex: '^<.*\.h>'
+    Priority: 1
+    SortPriority: 0
+    CaseSensitive: false
+  - Regex: "^<.*"
+    Priority: 2
+    SortPriority: 0
+    CaseSensitive: false
+  - Regex: ".*"
+    Priority: 3
+    SortPriority: 0
+    CaseSensitive: false
+
+# 检测主 include 文件的正则表达式。
+# 用途：识别带有 test/unittest 后缀的测试文件。
+IncludeIsMainRegex: "([-_](test|unittest))?$"
+
+# 检测主源文件的正则表达式（空 = 禁用）。
+IncludeIsMainSourceRegex: ""
+
+# -----------------------------------------------------------------------------
+# 缩进选项
+# -----------------------------------------------------------------------------
+
+# 如果为 true，缩进访问修饰符。
+# 默认值：false
+# 用途：启用此选项使访问修饰符与类内其他内容一起缩进。
+IndentAccessModifiers: false
+
+# 如果为 true，缩进 switch 语句中的 case 块。
+# 默认值：false
+# 用途：禁用以保持传统 switch 格式。
+IndentCaseBlocks: false
+
+# 如果为 true，缩进 switch 语句中的 case 标签。
+# 默认值：false
+# 用途：启用此选项以提高视觉层次。
+IndentCaseLabels: true
+
+# 如果为 true，缩进 export 块。
+# 默认值：false
+# 用途：启用此选项以支持 C++20 模块。
+IndentExportBlock: true
+
+# 控制 extern 块的缩进。
+# 取值：None, AfterExternBlock, IndentExternBlock
+# 默认值：None
+# 用途：AfterExternBlock 实现正确的缩进。
+IndentExternBlock: AfterExternBlock
+
+# 如果为 true，缩进 goto 标签。
+# 默认值：true
+# 用途：启用此选项以提高 goto 目标的可读性。
+IndentGotoLabels: true
+
+# 控制预处理指令的缩进。
+# 取值：None, AfterHash, Block
+# 默认值：None
+# 用途：None 保持指令在第 0 列。
+IndentPPDirectives: None
+
+# 如果为 true，缩进 concepts 中的 requires 子句。
+# 默认值：true
+# 用途：启用此选项以提高 C++20 concepts 的可读性。
+IndentRequiresClause: true
+
+# 控制缩进的空格数。
+# 取值：正整数
+# 默认值：4
+# 用途：4 个空格（匹配现有代码风格）
+IndentWidth: 4
+
+# 如果为 true，缩进换行的函数名。
+# 默认值：false
+# 用途：禁用以保持一致的函数格式。
+IndentWrappedFunctionNames: false
+
+# -----------------------------------------------------------------------------
+# 插入选项
+# -----------------------------------------------------------------------------
+
+# 如果为 true，在单语句体周围插入大括号。
+# 默认值：false
+# 用途：禁用以让开发者选择何时使用大括号。
+InsertBraces: false
+
+# 如果为 true，在文件末尾插入换行符。
+# 默认值：true
+# 用途：禁用以保持现有文件结尾。
+InsertNewlineAtEOF: false
+
+# 控制列表中尾随逗号的插入。
+# 取值：None, Wrap（换行时添加）, Always（始终添加）
+# 默认值：None
+# 用途：None 保持现有风格。
+InsertTrailingCommas: None
+
+# -----------------------------------------------------------------------------
+# 整数字面量选项
+# -----------------------------------------------------------------------------
+
+# 控制整数字面量中的分隔符插入。
+# Binary/Hex/Decimal：分隔符之间的位数（0 = 禁用）。
+# *MinDigitsInsert：插入分隔符所需的最小位数。
+# *MaxDigitsRemove：移除分隔符前允许的最大位数。
+# *MinDigits：应用分隔符规则的最小位数。
+# 默认值：全部为 0（禁用）
+# 用途：禁用以保持现有字面量格式。
+IntegerLiteralSeparator:
+  Binary: 0
+  BinaryMinDigitsInsert: 0
+  BinaryMaxDigitsRemove: 0
+  Decimal: 0
+  DecimalMinDigitsInsert: 0
+  DecimalMaxDigitsRemove: 0
+  Hex: 0
+  HexMinDigitsInsert: 0
+  HexMaxDigitsRemove: 0
+  BinaryMinDigits: 0
+  DecimalMinDigits: 0
+  HexMinDigits: 0
+
+# -----------------------------------------------------------------------------
+# JavaScript 选项
+# -----------------------------------------------------------------------------
+
+# 控制 JavaScript/TypeScript 中的引号风格。
+# 取值：Leave（保持原样）, Single, Double
+# 默认值：Leave
+# 用途：不适用于 C++ 项目。
+JavaScriptQuotes: Leave
+
+# 如果为 true，换行 JavaScript import 语句。
+# 默认值：true
+# 用途：不适用于 C++ 项目。
+JavaScriptWrapImports: true
+
+# -----------------------------------------------------------------------------
+# 保持选项
+# -----------------------------------------------------------------------------
+
+# 控制在特定位置保留空行。
+# AtEndOfFile：如果为 true，在文件末尾保留空行。
+# AtStartOfBlock：如果为 true，在块开头保留空行。
+# AtStartOfFile：如果为 true，在文件开头保留空行。
+# 默认值：AtEndOfFile: false, AtStartOfBlock: false, AtStartOfFile: true
+# 用途：在文件开头保留空行以保持一致性。
+KeepEmptyLines:
+  AtEndOfFile: false
+  AtStartOfBlock: false
+  AtStartOfFile: true
+
+# 如果为 true，保留换页符。
+# 默认值：false
+# 用途：禁用以支持现代代码。
+KeepFormFeed: false
+
+# -----------------------------------------------------------------------------
+# Lambda 选项
+# -----------------------------------------------------------------------------
+
+# 控制 lambda 体的缩进。
+# 取值：Signature（相对于签名缩进）, OuterScope（像周围代码一样缩进）
+# 默认值：OuterScope
+# 用途：Signature 提高 lambda 的可读性。
+LambdaBodyIndentation: Signature
+
+# -----------------------------------------------------------------------------
+# 行尾选项
+# -----------------------------------------------------------------------------
+
+# 控制行尾风格。
+# 取值：DeriveLF（使用 LF，从文件推导）, DeriveCRLF（使用 CRLF，从文件推导）,
+#       LF, CRLF, CR
+# 默认值：DeriveLF
+# 用途：DeriveLF 保持与现有文件的一致性。
+LineEnding: DeriveLF
+
+# -----------------------------------------------------------------------------
+# 宏块选项
+# -----------------------------------------------------------------------------
+
+# 宏块开始的正则表达式（空 = 禁用）。
+MacroBlockBegin: ""
+
+# 宏块结束的正则表达式（空 = 禁用）。
+MacroBlockEnd: ""
+
+# -----------------------------------------------------------------------------
+# 主 Include 选项
+# -----------------------------------------------------------------------------
+
+# 控制主 include 文件使用的字符。
+# 取值：Quote（"）, Angle（<）
+# 默认值：Quote
+# 用途：Quote 用于项目特定的主 includes。
+MainIncludeChar: Quote
+
+# -----------------------------------------------------------------------------
+# 最大选项
+# -----------------------------------------------------------------------------
+
+# 保留的最大连续空行数。
+# 取值：非负整数
+# 默认值：1
+# 用途：1 保持代码整洁，没有过多空行。
+MaxEmptyLinesToKeep: 1
+
+# -----------------------------------------------------------------------------
+# 命名空间选项
+# -----------------------------------------------------------------------------
+
+# 控制命名空间内部的缩进。
+# 取值：None, Inner, All
+# 默认值：None
+# 用途：None 实现紧凑的命名空间格式。
+NamespaceIndentation: None
+
+# -----------------------------------------------------------------------------
+# 数字字面量选项
+# -----------------------------------------------------------------------------
+
+# 控制数字字面量的大小写。
+# ExponentLetter：Leave/lower/upper 用于指数字母（e/E）。
+# HexDigit：Leave/lower/upper 用于十六进制数字。
+# Prefix：Leave/lower/upper 用于 0x/0X 前缀。
+# Suffix：Leave/lower/upper 用于后缀（u/U, l/L 等）。
+# 默认值：Leave（保持原样）
+# 用途：Leave 保持现有字面量风格。
+NumericLiteralCase:
+  ExponentLetter: Leave
+  HexDigit: Leave
+  Prefix: Leave
+  Suffix: Leave
+
+# -----------------------------------------------------------------------------
+# Objective-C 选项
+# -----------------------------------------------------------------------------
+
+# 控制 Objective-C 协议列表的装箱。
+# 取值：Always, Never, Auto
+# 默认值：Never
+# 用途：不适用于 C++ 项目。
+ObjCBinPackProtocolList: Never
+
+# 控制 Objective-C 块的缩进宽度。
+# 默认值：2
+# 用途：不适用于 C++ 项目。
+ObjCBlockIndentWidth: 2
+
+# 如果为 true，在嵌套 Objective-C 块参数前换行。
+# 默认值：true
+# 用途：不适用于 C++ 项目。
+ObjCBreakBeforeNestedBlockParam: true
+
+# 如果为 true，在 Objective-C 属性后添加空格。
+# 默认值：false
+# 用途：不适用于 C++ 项目。
+ObjCSpaceAfterProperty: false
+
+# 如果为 true，在 Objective-C 协议列表前添加空格。
+# 默认值：true
+# 用途：不适用于 C++ 项目。
+ObjCSpaceBeforeProtocolList: true
+
+# -----------------------------------------------------------------------------
+# 单行选项
+# -----------------------------------------------------------------------------
+
+# 不应在单行格式化的代码的正则表达式。
+# 用途：空表示无特殊处理。
+OneLineFormatOffRegex: ""
+
+# -----------------------------------------------------------------------------
+# 打包选项
+# -----------------------------------------------------------------------------
+
+# 控制构造函数初始化器的打包。
+# 取值：NextLine（全部放在下一行）, SameLine（保持在同一行）,
+#       Inherit（继承自 BreakConstructorInitializers）
+# 默认值：NextLine
+# 用途：SameLine 使初始化器尽量放在同一行，实现更紧凑的格式。
+PackConstructorInitializers: NextLine
+
+# -----------------------------------------------------------------------------
+# 罚分选项
+# 这些选项控制各种格式化选择的罚分。
+# 值越高表示格式化器越不可能做出该选择。
+# -----------------------------------------------------------------------------
+
+# 在赋值运算符周围换行的罚分。
+# 默认值：2
+PenaltyBreakAssignment: 2
+
+# 在第一个调用参数前换行的罚分。
+# 默认值：1
+PenaltyBreakBeforeFirstCallParameter: 1
+
+# 在成员访问运算符（.、->）前换行的罚分。
+# 默认值：150
+PenaltyBreakBeforeMemberAccess: 150
+
+# 在注释内部换行的罚分。
+# 默认值：300
+PenaltyBreakComment: 300
+
+# 在第一个 << 运算符前换行的罚分。
+# 默认值：120
+PenaltyBreakFirstLessLess: 120
+
+# 在括号内部换行的罚分。
+# 默认值：0
+PenaltyBreakOpenParenthesis: 0
+
+# 在作用域解析运算符（::）后换行的罚分。
+# 默认值：500
+PenaltyBreakScopeResolution: 500
+
+# 拆分字符串字面量的罚分。
+# 默认值：1000
+PenaltyBreakString: 1000
+
+# 拆分模板声明的罚分。
+# 默认值：10
+PenaltyBreakTemplateDeclaration: 10
+
+# 超出列限制的每个字符的罚分。
+# 默认值：1000000
+PenaltyExcessCharacter: 1000000
+
+# 导致缩进的空白字符的罚分。
+# 默认值：0
+PenaltyIndentedWhitespace: 0
+
+# 将返回类型放在单独一行的罚分。
+# 默认值：200
+PenaltyReturnTypeOnItsOwnLine: 200
+
+# -----------------------------------------------------------------------------
+# 指针选项
+# -----------------------------------------------------------------------------
+
+# 控制指针和引用的对齐。
+# 取值：Left（int* p）, Right（int *p）, Middle（int * p）
+# 默认值：Right
+# 用途：Left 用于现代 C++ 风格（int* p）。
+PointerAlignment: Left
+
+# -----------------------------------------------------------------------------
+# 预处理选项
+# -----------------------------------------------------------------------------
+
+# 控制预处理指令的缩进宽度。
+# 取值：-1（使用 IndentWidth）, 正整数
+# 默认值：-1
+# 用途：-1 使用标准缩进宽度。
+PPIndentWidth: -1
+
+# -----------------------------------------------------------------------------
+# 限定符选项
+# -----------------------------------------------------------------------------
+
+# 控制 const/volatile 限定符的对齐。
+# 取值：Leave（保持原样）, Left（const int*）, Right（int* const）
+# 默认值：Leave
+# 用途：Leave 保持现有风格。
+QualifierAlignment: Leave
+
+# -----------------------------------------------------------------------------
+# 原始字符串选项
+# -----------------------------------------------------------------------------
+
+# 原始字符串字面量的配置。
+# Language：此配置的语言。
+# Delimiters：分隔符标识符列表。
+# CanonicalDelimiter：格式化时首选的分隔符。
+# BasedOnStyle：要使用的基础风格。
+# 用途：配置 C++ 和 Protocol Buffers 的原始字符串处理。
+RawStringFormats:
+  - Language: Cpp
+    Delimiters:
+      - cc
+      - CC
+      - cpp
+      - Cpp
+      - CPP
+      - "c++"
+      - "C++"
+    CanonicalDelimiter: ""
+    BasedOnStyle: google
+  - Language: TextProto
+    Delimiters:
+      - pb
+      - PB
+      - proto
+      - PROTO
+    EnclosingFunctions:
+      - EqualsProto
+      - EquivToProto
+      - PARSE_PARTIAL_TEXT_PROTO
+      - PARSE_TEST_PROTO
+      - PARSE_TEXT_PROTO
+      - ParseTextOrDie
+      - ParseTextProtoOrDie
+      - ParseTestProto
+      - ParsePartialTestProto
+    CanonicalDelimiter: pb
+    BasedOnStyle: google
+
+# -----------------------------------------------------------------------------
+# 引用选项
+# -----------------------------------------------------------------------------
+
+# 控制引用的对齐（默认遵循 PointerAlignment）。
+# 取值：Pointer（与 PointerAlignment 相同）, Left, Right, Middle
+# 默认值：Pointer
+# 用途：Pointer 与指针风格对齐。
+ReferenceAlignment: Pointer
+
+# -----------------------------------------------------------------------------
+# 重排选项
+# -----------------------------------------------------------------------------
+
+# 控制注释的重排。
+# 取值：Always（始终重排）, Never（从不重排）,
+#       AfterKeyword（在关键字后重排）
+# 默认值：Always
+# 用途：Always 保持注释格式正确。
+ReflowComments: Always
+
+# -----------------------------------------------------------------------------
+# 移除选项
+# -----------------------------------------------------------------------------
+
+# 如果为 true，移除单语句体周围的大括号（LLVM 风格）。
+# 默认值：false
+# 用途：禁用以保持现有大括号风格。
+RemoveBracesLLVM: false
+
+# 如果为 true，移除未换行的行内的空行。
+# 默认值：false
+# 用途：禁用以保留空白行。
+RemoveEmptyLinesInUnwrappedLines: false
+
+# 控制括号的移除。
+# 取值：Leave（保持原样）, All（移除所有）,
+#       ControlStatements（从控制语句中移除）
+# 默认值：Leave
+# 用途：Leave 保持现有括号。
+RemoveParentheses: Leave
+
+# 如果为 true，从空语句中移除分号。
+# 默认值：false
+# 用途：禁用以保留显式分号。
+RemoveSemicolon: false
+
+# -----------------------------------------------------------------------------
+# Requires 选项
+# -----------------------------------------------------------------------------
+
+# 控制 requires 子句的位置。
+# 取值：OwnLine（单独一行）, WithFollowing（与后续内容一起）
+# 默认值：OwnLine
+# 用途：OwnLine 提高 C++20 concepts 的可读性。
+RequiresClausePosition: OwnLine
+
+# 控制 requires 表达式的缩进。
+# 取值：OuterScope（像周围代码一样缩进）,
+#       MemberInitializers（像成员初始化器一样缩进）
+# 默认值：OuterScope
+# 用途：OuterScope 保持一致的缩进。
+RequiresExpressionIndentation: OuterScope
+
+# -----------------------------------------------------------------------------
+# 分隔选项
+# -----------------------------------------------------------------------------
+
+# 控制定义块的分隔。
+# 取值：Leave（保持原样）, Always（添加空行）, Never（移除空行）
+# 默认值：Leave
+# 用途：Always 在函数定义块之间添加空行，提高可读性。
+SeparateDefinitionBlocks: Always
+
+# -----------------------------------------------------------------------------
+# 短选项
+# -----------------------------------------------------------------------------
+
+# 控制何时将命名空间折叠为单行。
+# 取值：非负整数（保持分开的最小行数）
+# 默认值：1
+# 用途：1 在适当情况下允许单行命名空间。
+ShortNamespaceLines: 1
+
+# -----------------------------------------------------------------------------
+# 跳过选项
+# -----------------------------------------------------------------------------
+
+# 如果为 true，跳过宏定义体的格式化。
+# 默认值：false
+# 用途：禁用以格式化宏体。
+SkipMacroDefinitionBody: false
+
+# -----------------------------------------------------------------------------
+# 排序选项
+# -----------------------------------------------------------------------------
+
+# 控制 #include 指令的排序。
+# Enabled：如果为 true，排序 includes。
+# IgnoreCase：如果为 true，不区分大小写排序。
+# IgnoreExtension：如果为 true，排序时忽略文件扩展名。
+# 默认值：Enabled: true
+# 用途：启用此选项以按字母顺序组织 includes。
+SortIncludes:
+  Enabled: true
+  IgnoreCase: false
+  IgnoreExtension: false
+
+# 控制 Java 静态导入的排序。
+# 取值：Before（在非静态导入之前）, After（在非静态导入之后）
+# 默认值：Before
+# 用途：不适用于 C++ 项目。
+SortJavaStaticImport: Before
+
+# 控制 using 声明的排序。
+# 取值：Lexicographic（字母顺序）, LexicographicNumeric（智能数字排序）
+# 默认值：Lexicographic
+# 用途：LexicographicNumeric 实现更好的数字排序。
+SortUsingDeclarations: LexicographicNumeric
+
+# -----------------------------------------------------------------------------
+# 空格选项
+# -----------------------------------------------------------------------------
+
+# 如果为 true，在 C 风格类型转换后添加空格。
+# 默认值：false
+# 用途：禁用以支持紧凑的类型转换表达式。
+SpaceAfterCStyleCast: false
+
+# 如果为 true，在逻辑非（!）后添加空格。
+# 默认值：false
+# 用途：禁用以支持紧凑表达式（!x 而非 ! x）。
+SpaceAfterLogicalNot: false
+
+# 如果为 true，在 operator 关键字后添加空格。
+# 默认值：false
+# 用途：禁用以保持 operator 定义紧凑。
+SpaceAfterOperatorKeyword: false
+
+# 如果为 true，在 template 关键字后添加空格。
+# 默认值：true
+# 用途：启用此选项以提高可读性（template <T>）。
+SpaceAfterTemplateKeyword: true
+
+# 控制指针限定符周围的空格。
+# 取值：Default（无特殊处理）, Before（int * p）,
+#       After（int *p）, Both（int * p）
+# 默认值：Default
+# 用途：Default 保持一致的指针格式。
+SpaceAroundPointerQualifiers: Default
+
+# 如果为 true，在赋值运算符前添加空格。
+# 默认值：true
+# 用途：启用此选项以提高可读性（a = b 而非 a=b）。
+SpaceBeforeAssignmentOperators: true
+
+# 如果为 true，在 case 语句的冒号前添加空格。
+# 默认值：false
+# 用途：禁用以支持紧凑的 case 标签（case 1:）。
+SpaceBeforeCaseColon: false
+
+# 如果为 true，在 C++11 大括号列表前添加空格。
+# 默认值：false
+# 用途：禁用以支持紧凑的初始化器（int x{1}）。
+SpaceBeforeCpp11BracedList: false
+
+# 如果为 true，在构造函数初始化器的冒号前添加空格。
+# 默认值：true
+# 用途：启用此选项以提高可读性（ClassName() : member(0)）。
+SpaceBeforeCtorInitializerColon: true
+
+# 如果为 true，在继承列表的冒号前添加空格。
+# 默认值：true
+# 用途：启用此选项以提高可读性（class Derived : public Base）。
+SpaceBeforeInheritanceColon: true
+
+# 如果为 true，在类 JSON 结构的冒号前添加空格。
+# 默认值：false
+# 用途：不适用于 C++ 项目。
+SpaceBeforeJsonColon: false
+
+# 控制何时在括号前添加空格。
+# 取值：None, ControlStatements, Always
+# 默认值：ControlStatements
+# 用途：ControlStatements 用于 if (x), while (x) 等。
+SpaceBeforeParens: ControlStatements
+
+# 括号前空格的细粒度控制。
+# AfterControlStatements：如果为 true，在控制语句后添加空格。
+# AfterForeachMacros：如果为 true，在 foreach 宏后添加空格。
+# AfterFunctionDefinitionName：如果为 true，在函数定义名后添加空格。
+# AfterFunctionDeclarationName：如果为 true，在函数声明名后添加空格。
+# AfterIfMacros：如果为 true，在 if 宏后添加空格。
+# AfterNot：如果为 true，在 ! 运算符后添加空格。
+# AfterOverloadedOperator：如果为 true，在重载运算符名后添加空格。
+# AfterPlacementOperator：如果为 true，在 placement 运算符（new、delete）后添加空格。
+# AfterRequiresInClause：如果为 true，在 requires 子句中添加空格。
+# AfterRequiresInExpression：如果为 true，在 requires 表达式中添加空格。
+# BeforeNonEmptyParentheses：如果为 true，在非空括号前添加空格。
+# 默认值：AfterControlStatements: true，其他为 false
+# 用途：针对特定上下文微调空格。
+SpaceBeforeParensOptions:
+  AfterControlStatements: true
+  AfterForeachMacros: true
+  AfterFunctionDefinitionName: false
+  AfterFunctionDeclarationName: false
+  AfterIfMacros: true
+  AfterNot: false
+  AfterOverloadedOperator: false
+  AfterPlacementOperator: true
+  AfterRequiresInClause: false
+  AfterRequiresInExpression: false
+  BeforeNonEmptyParentheses: false
+
+# 如果为 true，在范围-based for 循环的冒号前添加空格。
+# 默认值：true
+# 用途：启用此选项以提高可读性（for (auto& x : range)）。
+SpaceBeforeRangeBasedForLoopColon: true
+
+# 如果为 true，在方括号前添加空格。
+# 默认值：false
+# 用途：禁用以支持紧凑的数组访问（arr[i]）。
+SpaceBeforeSquareBrackets: false
+
+# 控制空大括号内的空格。
+# 取值：Never（{}）, Always（{ }）, Leave（保持原样）
+# 默认值：Never
+# 用途：Never 实现紧凑的空大括号。
+SpaceInEmptyBraces: Never
+
+# 尾随注释前的空格数。
+# 取值：非负整数
+# 默认值：1
+# 用途：2 个空格清晰分隔代码和注释。
+SpacesBeforeTrailingComments: 2
+
+# 控制尖括号内的空格。
+# 取值：Never（<>）, Always（< >）, Leave（保持原样）, Custom
+# 默认值：Never
+# 用途：Never 实现紧凑的模板语法（<T>）。
+SpacesInAngles: Never
+
+# 如果为 true，在容器字面量内添加空格。
+# 默认值：true
+# 用途：启用此选项以提高可读性（{ 1, 2, 3 }）。
+SpacesInContainerLiterals: true
+
+# 控制行注释前缀中的空格。
+# Minimum：最小空格数。
+# Maximum：最大空格数（-1 = 无限制）。
+# 默认值：Minimum: 1, Maximum: -1
+# 用途：// 后使用标准单个空格。
+SpacesInLineCommentPrefix:
+  Minimum: 1
+  Maximum: -1
+
+# 控制括号内的空格。
+# 取值：Never（()）, Always（( )）, Leave（保持原样）, Custom
+# 默认值：Never
+# 用途：Never 实现紧凑的表达式。
+SpacesInParens: Never
+
+# 括号内空格的细粒度控制。
+# ExceptDoubleParentheses：如果为 true，在双括号内添加空格。
+# InCStyleCasts：如果为 true，在 C 风格类型转换内添加空格。
+# InConditionalStatements：如果为 true，在条件语句内添加空格。
+# InEmptyParentheses：如果为 true，在空括号内添加空格。
+# Other：如果为 true，在其他上下文中添加空格。
+# 默认值：全部为 false
+# 用途：括号内不添加额外空格。
+SpacesInParensOptions:
+  ExceptDoubleParentheses: false
+  InCStyleCasts: false
+  InConditionalStatements: false
+  InEmptyParentheses: false
+  Other: false
+
+# 控制方括号内的空格。
+# 取值：Never（[]）, Always（[ ]）, Leave（保持原样）
+# 默认值：Never
+# 用途：Never 实现紧凑的数组语法。
+SpacesInSquareBrackets: false
+
+# -----------------------------------------------------------------------------
+# 标准选项
+# -----------------------------------------------------------------------------
+
+# 控制解析时使用的 C++ 标准。
+# 取值：Cpp03, Cpp11, Cpp14, Cpp17, Cpp20, Auto
+# 默认值：Auto
+# 用途：Auto 从源代码自动检测。
+Standard: Auto
+
+# -----------------------------------------------------------------------------
+# 语句选项
+# -----------------------------------------------------------------------------
+
+# 应被视为语句属性的宏列表。
+# 用途：支持 Qt 的 Q_EMIT 宏。
+StatementAttributeLikeMacros:
+  - Q_EMIT
+
+# 应被视为语句的宏列表。
+# 用途：支持常见的语句宏。
+StatementMacros:
+  - Q_UNUSED
+  - QT_REQUIRE_VERSION
+
+# -----------------------------------------------------------------------------
+# TableGen 选项
+# -----------------------------------------------------------------------------
+
+# 控制 TableGen DAG 参数内的换行。
+# 取值：DontBreak, Break
+# 默认值：DontBreak
+# 用途：不适用于 C++ 项目。
+TableGenBreakInsideDAGArg: DontBreak
+
+# -----------------------------------------------------------------------------
+# Tab 选项
+# -----------------------------------------------------------------------------
+
+# Tab 字符的宽度。
+# 取值：正整数
+# 默认值：8
+# 用途：8 个空格 per tab（标准）。
+TabWidth: 8
+
+# 控制何时使用 tabs。
+# 取值：Never, ForIndentation, ForContinuationAndIndentation, Always
+# 默认值：Never
+# 用途：Never 仅使用空格。
+UseTab: Never
+
+# -----------------------------------------------------------------------------
+# Verilog 选项
+# -----------------------------------------------------------------------------
+
+# 如果为 true，在 Verilog 实例端口之间换行。
+# 默认值：true
+# 用途：不适用于 C++ 项目。
+VerilogBreakBetweenInstancePorts: true
+
+# -----------------------------------------------------------------------------
+# 空白选项
+# -----------------------------------------------------------------------------
+
+# 空白字符重要的宏列表。
+# 用途：保持字符串化宏中的格式。
+WhitespaceSensitiveMacros:
+  - BOOST_PP_STRINGIZE
+  - CF_SWIFT_NAME
+  - NS_SWIFT_NAME
+  - PP_STRINGIZE
+  - STRINGIZE
+
+# -----------------------------------------------------------------------------
+# 换行选项
+# -----------------------------------------------------------------------------
+
+# 控制命名空间体的空行换行。
+# 取值：Leave（保持原样）, Always（添加空行）, Never（移除空行）
+# 默认值：Leave
+# 用途：Leave 保持现有风格。
+WrapNamespaceBodyWithEmptyLines: Leave
+
+# =============================================================================
+# 配置结束
+# =============================================================================
