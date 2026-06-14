@@ -8,9 +8,8 @@
 #include <cassert>
 #include <iostream>
 #include <string>
-#include <vector>
 
-#include "../include/ini.h"
+#include "include/ini.h"
 
 // ============================================================
 // 5. 遍历所有节与键值

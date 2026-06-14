@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string>
 
-#include "../include/ini.h"
+#include "include/ini.h"
 
 void demo_load_and_access()
 {

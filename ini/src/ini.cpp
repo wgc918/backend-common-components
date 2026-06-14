@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <fstream>
+#include <iostream>
 
 IniFile& IniFile::instance() noexcept
 {
@@ -15,7 +16,7 @@ void IniFile::load(const std::string& file_name)
     fin.open(file_name, std::ios::in);
     if (fin.fail())
     {
-        std::cout << "fail" << "\n";
+        std::cout << "Failed to open " << file_name << "\n";
         return;
     }
     m_ini.clear();
