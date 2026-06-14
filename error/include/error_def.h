@@ -34,7 +34,8 @@
 
 #pragma once
 
-#include "error_kind.h"
+/// @brief 辅助宏：连接两个宏参数
+#define EF_CONCAT(a, b) a##b
 
 /// @brief 从 X-Macro 错误列表生成 constexpr int 错误码常量
 /// @param XMacroList  一个 X-Macro 列表，如 DB_ERRORS(X)
@@ -47,9 +48,13 @@
 /// @param XMacroList  一个 X-Macro 列表，如 DB_ERRORS(X)
 #define EF_GEN_ERROR_META(XMacroList)                                            \
     inline constexpr ::ef::ErrorInfo kErrorTable[] = {XMacroList(EF_GEN_ENTRY)}; \
-    inline const ::ef::ErrorInfo* LookopError(int code) noexcept                 \
+    namespace EF_CONCAT(m_, XMacroList)                                          \
     {                                                                            \
-        return ::ef::LookupInTable(KErrorTable, code);                           \
+    XMacroList(EF_GEN_CODE)                                                      \
+    }                                                                            \
+    inline const ::ef::ErrorInfo* LookupError(int code) noexcept                 \
+    {                                                                            \
+        return ::ef::LookupInTable(kErrorTable, code);                           \
     }
 
 /// @brief X-Macro 辅助：展开为 ErrorInfo 表项
