@@ -1,0 +1,23 @@
+#include <jdbc/cppconn/driver.h>
+#include <jdbc/mysql_connection.h>
+#include <jdbc/mysql_driver.h>
+
+using namespace sql;
+using namespace std;
+
+#define DBHOST   "tcp://127.0.0.1:3306"
+#define USER     "wgc"
+#define PASSWORD "123456"
+
+int main()
+{
+    Driver*     driver;
+    Connection* conn;
+    driver = get_driver_instance();
+    conn   = driver->connect(DBHOST, USER, PASSWORD);
+    cout << "DataBase connection autocommit mode = " << conn->getAutoCommit() << endl;
+    delete conn;
+    driver = NULL;
+    conn   = NULL;
+    return 0;
+}
