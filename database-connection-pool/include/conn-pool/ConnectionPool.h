@@ -23,10 +23,14 @@
 #include "../database/IDatabaseConnection.h"
 #include "../monitor/IHealthChecker.h"
 #include "../monitor/PoolStatistics.h"
-#include "pooledConnGuard.h"
+
+
+class PooledConnGuard;
 
 class ConnectionPool
 {
+    friend class PooledConnGuard;
+
 public:
     // ---- 禁用拷贝与移动 ----
     ConnectionPool(const ConnectionPool& other)            = delete;
@@ -80,12 +84,9 @@ private:
 
     void return_connection(IDatabaseConnection* conn);
 
-    // 让 PooledConnGuard 可以访问 return_connection
-    friend class PooledConnGuard;
-
 private:
     // ---- 多类型单例管理 ----
-    static std::mutex                              s_instance_mutex;
+    static std::mutex                                        s_instance_mutex;
     static std::unordered_map<DatabaseType, ConnectionPool*> s_instances;
 
     // ---- 连接管理 ----

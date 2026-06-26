@@ -9,5 +9,4 @@ enum class DatabaseType
     PostgreSQL,  // PostgreSQL
     Oracle,      // Oracle
     SQLServer,   // Microsoft SQL Server
-    MongoDB,     // MongoDB (NoSQL)
 };

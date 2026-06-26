@@ -2,8 +2,7 @@
 #include <memory>
 
 #include "../database/IDatabaseConnection.h"
-
-class ConnectionPool;
+#include "ConnectionPool.h"
 
 /// 连接守卫（RAII）
 /// 从连接池获取连接后，由 PooledConnGuard 持有；

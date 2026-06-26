@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 #include <cstdint>
 #include <string>
 
@@ -7,7 +8,13 @@
 class IResultSet
 {
 public:
-    virtual ~IResultSet() = default;
+    IResultSet()                              = default;
+    IResultSet(IResultSet&& other)            = default;
+    IResultSet& operator=(IResultSet&& other) = default;
+    virtual ~IResultSet()                     = default;
+
+    IResultSet(const IResultSet& other)            = delete;
+    IResultSet& operator=(const IResultSet& other) = delete;
 
     /// 游标移动到下一行
     /// @return true 存在下一行，false 已到末尾
@@ -17,7 +24,7 @@ public:
     virtual void close() = 0;
 
     /// 获取结果集列数
-    virtual int get_column_count() = 0;
+    virtual std::size_t get_column_count() = 0;
 
     // ---- 按列名读取 ----
     virtual int get_int(const std::string& column_name)            = 0;

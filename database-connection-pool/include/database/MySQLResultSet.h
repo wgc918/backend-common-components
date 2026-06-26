@@ -1,4 +1,7 @@
 #pragma once
+#include <jdbc/cppconn/resultset.h>
+
+#include <cstddef>
 #include <cstdint>
 #include <string>
 
@@ -8,13 +11,19 @@
 class MySQLResultSet : public IResultSet
 {
 public:
-    MySQLResultSet();
+    MySQLResultSet(sql::ResultSet* res);
     ~MySQLResultSet() override;
+
+    MySQLResultSet(MySQLResultSet&& other);
+    MySQLResultSet& operator=(MySQLResultSet&& other);
+
+    MySQLResultSet(const MySQLResultSet& other)            = delete;
+    MySQLResultSet& operator=(const MySQLResultSet& other) = delete;
 
     // ---- IResultSet 接口实现 ----
     bool next() override;
     void close() override;
-    int get_column_count() override;
+    std::size_t get_column_count() override;
 
     int get_int(const std::string& column_name) override;
     uint32_t get_uint(const std::string& column_name) override;
@@ -36,4 +45,7 @@ public:
 
     bool is_null(const std::string& column_name) override;
     bool is_null(uint16_t column_index) override;
+
+private:
+    sql::ResultSet* m_res;
 };
