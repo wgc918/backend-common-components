@@ -61,12 +61,15 @@ IDatabaseConnection* PooledConnGuard::operator->() const
 /// 检查是否持有有效连接
 PooledConnGuard::operator bool() const
 {
-    return (m_pool != nullptr && m_conn != nullptr && m_released);
+    return (m_pool != nullptr && m_conn != nullptr && !m_released);
 }
 
 /// 主动归还连接（提前归还，析构时不再重复归还）
 void PooledConnGuard::release()
 {
-    // if (!m_released)
-    // m_pool->return_connection(m_conn);
+    if (!m_released)
+    {
+        m_pool->return_connection(m_conn);
+        m_released = true;
+    }
 }

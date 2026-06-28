@@ -40,22 +40,26 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/../src/MySQLFactory.cpp
     ${PROJECT_SOURCE_DIR}/../src/MySQLResultSet.cpp
     ${PROJECT_SOURCE_DIR}/../src/pooledConnGuard.cpp
+    ${PROJECT_SOURCE_DIR}/../src/ConnectionPool.cpp
  )
 
 # 添加测试目标
 add_executable(test test.cpp)
 add_executable(test_mysql test_mysql.cpp ${TEST_SOURCES})
 add_executable(test_mysql_factory test_mysql_factory.cpp ${TEST_SOURCES})
+add_executable(test_pool test_pool.cpp ${TEST_SOURCES})
 
 target_link_libraries(test mysqlcppconn)
 target_link_libraries(test_mysql mysqlcppconn)
 target_link_libraries(test_mysql_factory mysqlcppconn)
+target_link_libraries(test_pool mysqlcppconn)
 
 # 创建运行所有测试的自定义目标
 add_custom_target(run_all
-    COMMAND ${CMAKE_BINARY_DIR}/test
-    COMMAND ${CMAKE_BINARY_DIR}/test_mysql
-    COMMAND ${CMAKE_BINARY_DIR}/test_mysql_factory
+    COMMAND echo "=== Running basic tests ===" && ${CMAKE_BINARY_DIR}/test
+    COMMAND echo "=== Running MySQL tests ===" && ${CMAKE_BINARY_DIR}/test_mysql
+    COMMAND echo "=== Running MySQL factory tests ===" && ${CMAKE_BINARY_DIR}/test_mysql_factory
+    COMMAND echo "=== Running connection pool tests ===" && ${CMAKE_BINARY_DIR}/test_pool
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     COMMENT "Running all test executables..."
     VERBATIM
