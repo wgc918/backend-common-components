@@ -41,6 +41,7 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/../src/MySQLResultSet.cpp
     ${PROJECT_SOURCE_DIR}/../src/pooledConnGuard.cpp
     ${PROJECT_SOURCE_DIR}/../src/ConnectionPool.cpp
+    ${PROJECT_SOURCE_DIR}/../src/MySQLHealthChecker.cpp
  )
 
 # 添加测试目标

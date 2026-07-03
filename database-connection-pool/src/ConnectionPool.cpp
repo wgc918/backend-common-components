@@ -250,8 +250,8 @@ ConnectionPool::~ConnectionPool()
 {
     if (m_factory != nullptr)
         delete m_factory;
-    if (m_health_checker != nullptr)
-        delete m_health_checker;
+    //if (m_health_checker != nullptr)
+       // delete m_health_checker;
 }
 
 void ConnectionPool::return_connection(IDatabaseConnection* conn)
