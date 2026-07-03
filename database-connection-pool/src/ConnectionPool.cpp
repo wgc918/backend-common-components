@@ -30,6 +30,19 @@ ConnectionPool& ConnectionPool::instance(DatabaseType type)
     return *pool;
 }
 
+void ConnectionPool::destroy_instance(DatabaseType type)
+{
+    std::lock_guard<std::mutex> lock(s_instance_mutex);
+
+    auto it = s_instances.find(type);
+    if (it != s_instances.end())
+    {
+        it->second->shutdown();
+        delete it->second;
+        s_instances.erase(it);
+    }
+}
+
 // ---- 初始化 ----
 
 void ConnectionPool::init(const ConnectionConfig& cfg)
@@ -62,7 +75,7 @@ PooledConnGuard ConnectionPool::get_connection()
 
     std::unique_lock<std::mutex> locker(m_mutex);
 
-    // 待优化： 当可用连接数不足时再扩容
+    //  当前没有可用连接 且 连接数还没到达限制
     if (m_conn_queue.empty() && m_current_size < m_max_size)
     {
         expand_connections();
@@ -76,6 +89,7 @@ PooledConnGuard ConnectionPool::get_connection()
         // 超时仍未获取到连接
         if (status == std::cv_status::timeout && m_conn_queue.empty())
         {
+            // 真实业务场景可以在这里加一条日志
             return PooledConnGuard(this, nullptr);
         }
     }

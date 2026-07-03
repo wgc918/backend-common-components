@@ -37,6 +37,8 @@ public:
     /// @return 该类型对应的唯一连接池实例引用
     static ConnectionPool& instance(DatabaseType type);
 
+    static void destroy_instance(DatabaseType type);
+
     // ---- 初始化 ----
 
     void init(const ConnectionConfig& cfg);
