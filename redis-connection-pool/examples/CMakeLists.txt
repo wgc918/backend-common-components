@@ -51,4 +51,4 @@ add_executable(test_pool test_pool.cpp ${POOL_SOURCES})
 
 target_link_libraries(test redis++)
 target_link_libraries(test_ops redis++)
-target_link_libraries(test_pool redis++ pthread)
+target_link_libraries(test_pool redis++ hiredis pthread)

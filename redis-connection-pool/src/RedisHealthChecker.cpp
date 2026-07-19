@@ -1,7 +1,5 @@
 #include "../include/redis-pool/RedisHealthChecker.h"
 
-#include <iostream>
-
 HealthStatus RedisHealthChecker::check(sw::redis::Redis* conn)
 {
     if (conn == nullptr)
@@ -9,28 +7,13 @@ HealthStatus RedisHealthChecker::check(sw::redis::Redis* conn)
         return HealthStatus::Unhealthy;
     }
 
-    try
+    // 发送 PING 命令检测连接是否正常
+    auto reply = conn->ping();
+    if (reply == "PONG")
     {
-        // 发送 PING 命令检测连接是否正常
-        auto reply = conn->ping();
-        if (reply == "PONG")
-        {
-            return HealthStatus::Healthy;
-        }
-        return HealthStatus::Unknown;
+        return HealthStatus::Healthy;
     }
-    catch (const sw::redis::Error& e)
-    {
-        // 捕获 redis-plus-plus 异常
-        std::cerr << "[RedisHealthChecker] PING failed: " << e.what() << std::endl;
-        return HealthStatus::Unhealthy;
-    }
-    catch (const std::exception& e)
-    {
-        // 捕获其他异常
-        std::cerr << "[RedisHealthChecker] Unexpected error: " << e.what() << std::endl;
-        return HealthStatus::Unhealthy;
-    }
+    return HealthStatus::Unknown;
 }
 
 void RedisHealthChecker::set_timeout_ms(int timeout_ms)

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
@@ -7,6 +8,8 @@
 #include "../include/redis-pool/RedisConnectionPool.h"
 
 using namespace std;
+
+mutex g_mutx;
 
 /// 基本操作示例：使用连接池进行 SET/GET 操作
 void basic_operations()
@@ -37,7 +40,6 @@ void basic_operations()
         cout << "GET pool_key: (nil)" << endl;
     }
 
-    // guard 析构时自动归还连接
     cout << endl;
 }
 
@@ -55,6 +57,7 @@ void multi_thread_test()
                 auto guard = RedisConnectionPool::instance().get_connection();
                 if (!guard)
                 {
+                    lock_guard<mutex> lock(g_mutx);
                     cerr << "Thread " << i << ": Failed to get connection" << endl;
                     return;
                 }
@@ -65,6 +68,7 @@ void multi_thread_test()
                 auto val = guard->get(key);
                 if (val)
                 {
+                    lock_guard<mutex> lock(g_mutx);
                     cout << "Thread " << i << ": " << key << " = " << *val << endl;
                 }
 
@@ -235,8 +239,14 @@ int main()
         // 打印配置
         print_config();
 
+        // 打印统计信息
+        print_statistics();
+
         // 基本操作
         basic_operations();
+
+        // 打印统计信息
+        print_statistics();
 
         // 批量操作
         batch_operations();
@@ -257,7 +267,7 @@ int main()
 
     // 优雅关闭连接池
     cout << "Shutting down connection pool..." << endl;
-    pool.shutdown();
+    pool.shutdown();  // 可能持续时间会比较长，因为后台管理线程设置的频率是30s一次，关掉之前需要先销毁它
     cout << "Connection pool shut down successfully." << endl;
 
     return 0;

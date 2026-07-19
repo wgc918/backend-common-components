@@ -5,35 +5,12 @@
 
 #include "../include/redis-pool/RedisConnGuard.h"
 
-// 静态成员变量定义
-std::mutex           RedisConnectionPool::s_instance_mutex;
-RedisConnectionPool* RedisConnectionPool::s_instance = nullptr;
-
 /// 获取连接池单例
 /// @return 全局唯一连接池实例引用
 RedisConnectionPool& RedisConnectionPool::instance()
 {
-    std::lock_guard<std::mutex> lock(s_instance_mutex);
-
-    if (s_instance == nullptr)
-    {
-        s_instance = new RedisConnectionPool();
-    }
-
-    return *s_instance;
-}
-
-/// 销毁连接池单例，释放所有资源
-void RedisConnectionPool::destroy_instance()
-{
-    std::lock_guard<std::mutex> lock(s_instance_mutex);
-
-    if (s_instance != nullptr)
-    {
-        s_instance->shutdown();
-        delete s_instance;
-        s_instance = nullptr;
-    }
+    static RedisConnectionPool s_instance;
+    return s_instance;
 }
 
 // ---- 构造与析构 ----
@@ -50,20 +27,20 @@ RedisConnectionPool::RedisConnectionPool()
       m_recycle_running(false)
 {
     // 初始化统计信息
-    m_stats.active_connections = 0;
-    m_stats.idle_connections   = 0;
-    m_stats.total_connections  = 0;
-    m_stats.total_borrowed         = 0;
-    m_stats.total_released         = 0;
-    m_stats.total_created          = 0;
-    m_stats.total_destroyed        = 0;
-    m_stats.total_timeout_errors   = 0;
-    m_stats.total_reconnect_count  = 0;
-    m_stats.pending_waiters        = 0;
-    m_stats.avg_wait_time_ms       = 0;
-    m_stats.max_wait_time_ms       = 0;
-    m_stats.created_at             = std::chrono::system_clock::now();
-    m_stats.updated_at             = std::chrono::system_clock::now();
+    m_stats.active_connections    = 0;
+    m_stats.idle_connections      = 0;
+    m_stats.total_connections     = 0;
+    m_stats.total_borrowed        = 0;
+    m_stats.total_released        = 0;
+    m_stats.total_created         = 0;
+    m_stats.total_destroyed       = 0;
+    m_stats.total_timeout_errors  = 0;
+    m_stats.total_reconnect_count = 0;
+    m_stats.pending_waiters       = 0;
+    m_stats.avg_wait_time_ms      = 0;
+    m_stats.max_wait_time_ms      = 0;
+    m_stats.created_at            = std::chrono::system_clock::now();
+    m_stats.updated_at            = std::chrono::system_clock::now();
 }
 
 RedisConnectionPool::~RedisConnectionPool()
@@ -88,7 +65,7 @@ void RedisConnectionPool::init(const RedisConnectionConfig& cfg)
 }
 
 void RedisConnectionPool::init(const RedisConnectionConfig& cfg, int min, int max, int idle_time,
-                                int timeout, int op_num)
+                               int timeout, int op_num)
 {
     m_cfg           = cfg;
     m_initialized   = true;
@@ -113,7 +90,8 @@ RedisConnGuard RedisConnectionPool::get_connection()
 {
     if (!m_initialized)
     {
-        std::cerr << "[RedisConnectionPool] Please call init() before get_connection()" << std::endl;
+        std::cerr << "[RedisConnectionPool] Please call init() before get_connection()"
+                  << std::endl;
         return RedisConnGuard(this, nullptr);
     }
 
@@ -125,10 +103,8 @@ RedisConnGuard RedisConnectionPool::get_connection()
         expand_connections();
     }
 
-    // 等待可用连接，带超时机制
     if (m_conn_queue.empty())
     {
-        // 记录等待开始时间
         auto wait_start = std::chrono::steady_clock::now();
 
         {
@@ -157,8 +133,8 @@ RedisConnGuard RedisConnectionPool::get_connection()
 
         // 更新等待时间统计
         auto wait_end = std::chrono::steady_clock::now();
-        auto wait_ms  = std::chrono::duration_cast<std::chrono::milliseconds>(wait_end - wait_start)
-                           .count();
+        auto wait_ms =
+            std::chrono::duration_cast<std::chrono::milliseconds>(wait_end - wait_start).count();
         {
             std::lock_guard<std::mutex> stats_lock(m_stats_mutex);
             if (m_stats.total_borrowed > 0)
@@ -176,7 +152,7 @@ RedisConnGuard RedisConnectionPool::get_connection()
                 m_stats.max_wait_time_ms = wait_ms;
             }
         }
-    }
+    }  // end of m_conn_queue.empty()
 
     // 获取连接
     if (!m_conn_queue.empty())
@@ -196,7 +172,7 @@ RedisConnGuard RedisConnectionPool::get_connection()
         return guard;
     }
 
-    // 理论上不应该到达这里，但为了安全返回空守卫
+    // 理论上不应该到达这里
     return RedisConnGuard(this, nullptr);
 }
 
@@ -229,7 +205,7 @@ void RedisConnectionPool::return_connection(sw::redis::Redis* conn)
     }
     else
     {
-        // 连接无效，销毁并尝试创建新连接补充
+        // 连接无效
         destroy_connection(conn);
 
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -243,20 +219,11 @@ void RedisConnectionPool::return_connection(sw::redis::Redis* conn)
         // 如果当前连接数低于最小连接数，补充连接
         if (m_current_size < m_min_size)
         {
-            try
+            sw::redis::Redis* new_conn = create_connection();
+            if (new_conn != nullptr)
             {
-                sw::redis::Redis* new_conn = create_connection();
-                if (new_conn != nullptr)
-                {
-                    m_conn_queue.push(
-                        std::make_pair(new_conn, std::chrono::steady_clock::now()));
-                    m_cv_empty.notify_one();
-                }
-            }
-            catch (const std::exception& e)
-            {
-                std::cerr << "[RedisConnectionPool] Failed to create replacement connection: "
-                          << e.what() << std::endl;
+                m_conn_queue.push(std::make_pair(new_conn, std::chrono::steady_clock::now()));
+                m_cv_empty.notify_one();
             }
         }
 
@@ -274,27 +241,19 @@ void RedisConnectionPool::source_connections()
 {
     for (int i = 0; i < m_min_size; i++)
     {
-        try
+        sw::redis::Redis* conn = create_connection();
+        if (conn != nullptr)
         {
-            sw::redis::Redis* conn = create_connection();
-            if (conn != nullptr)
-            {
-                std::lock_guard<std::mutex> lock(m_mutex);
-                m_conn_queue.push(std::make_pair(conn, std::chrono::steady_clock::now()));
-            }
-        }
-        catch (const std::exception& e)
-        {
-            std::cerr << "[RedisConnectionPool] Failed to create initial connection " << i << ": "
-                      << e.what() << std::endl;
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_conn_queue.push(std::make_pair(conn, std::chrono::steady_clock::now()));
         }
     }
 
     {
         std::lock_guard<std::mutex> stats_lock(m_stats_mutex);
-        m_stats.idle_connections = static_cast<int>(m_conn_queue.size());
+        m_stats.idle_connections  = static_cast<int>(m_conn_queue.size());
         m_stats.total_connections = m_current_size;
-        m_stats.updated_at       = std::chrono::system_clock::now();
+        m_stats.updated_at        = std::chrono::system_clock::now();
     }
 }
 
@@ -311,48 +270,32 @@ void RedisConnectionPool::expand_connections()
 
     for (int i = 0; i < to_create; i++)
     {
-        try
+        sw::redis::Redis* conn = create_connection();
+        if (conn != nullptr)
         {
-            sw::redis::Redis* conn = create_connection();
-            if (conn != nullptr)
-            {
-                m_conn_queue.push(std::make_pair(conn, std::chrono::steady_clock::now()));
-            }
-        }
-        catch (const std::exception& e)
-        {
-            std::cerr << "[RedisConnectionPool] Failed to expand connection: " << e.what()
-                      << std::endl;
+            m_conn_queue.push(std::make_pair(conn, std::chrono::steady_clock::now()));
         }
     }
 
     {
         std::lock_guard<std::mutex> stats_lock(m_stats_mutex);
-        m_stats.idle_connections = static_cast<int>(m_conn_queue.size());
+        m_stats.idle_connections  = static_cast<int>(m_conn_queue.size());
         m_stats.total_connections = m_current_size;
-        m_stats.updated_at       = std::chrono::system_clock::now();
+        m_stats.updated_at        = std::chrono::system_clock::now();
     }
 }
 
 sw::redis::Redis* RedisConnectionPool::create_connection()
 {
-    try
-    {
-        sw::redis::Redis* conn = m_factory.create_connection(m_cfg);
-        m_current_size++;
+    sw::redis::Redis* conn = m_factory.create_connection(m_cfg);
+    m_current_size++;
 
-        {
-            std::lock_guard<std::mutex> stats_lock(m_stats_mutex);
-            m_stats.total_created++;
-        }
-
-        return conn;
-    }
-    catch (const std::exception& e)
     {
-        std::cerr << "[RedisConnectionPool] Failed to create connection: " << e.what() << std::endl;
-        throw;
+        std::lock_guard<std::mutex> stats_lock(m_stats_mutex);
+        m_stats.total_created++;
     }
+
+    return conn;
 }
 
 void RedisConnectionPool::destroy_connection(sw::redis::Redis* conn)
@@ -379,33 +322,33 @@ void RedisConnectionPool::start_recycle_thread()
     }
 
     m_recycle_running = true;
-    m_recycle_thread  = std::thread([this]() {
-        while (m_recycle_running)
+    m_recycle_thread  = std::thread(
+        [this]()
         {
-            // 每 30 秒检查一次
-            std::this_thread::sleep_for(std::chrono::seconds(30));
-            if (m_recycle_running)
+            while (m_recycle_running)
             {
-                recycle_idle_connections();
+                // 每 30 秒检查一次
+                std::this_thread::sleep_for(std::chrono::seconds(30));
+                if (m_recycle_running)
+                {
+                    recycle_idle_connections();
+                }
             }
-        }
-    });
+        });
 }
 
 void RedisConnectionPool::stop_recycle_thread()
 {
     m_recycle_running = false;
     if (m_recycle_thread.joinable())
-    {
         m_recycle_thread.join();
-    }
 }
 
 void RedisConnectionPool::recycle_idle_connections()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    auto now = std::chrono::steady_clock::now();
+    auto now        = std::chrono::steady_clock::now();
     int  queue_size = static_cast<int>(m_conn_queue.size());
 
     // 计算可以回收的连接数（保留至少 m_min_size 个连接）
@@ -442,12 +385,12 @@ void RedisConnectionPool::recycle_idle_connections()
     {
         {
             std::lock_guard<std::mutex> stats_lock(m_stats_mutex);
-            m_stats.idle_connections = static_cast<int>(m_conn_queue.size());
+            m_stats.idle_connections  = static_cast<int>(m_conn_queue.size());
             m_stats.total_connections = m_current_size;
-            m_stats.updated_at       = std::chrono::system_clock::now();
+            m_stats.updated_at        = std::chrono::system_clock::now();
         }
-        std::cout << "[RedisConnectionPool] Recycled " << recycled << " idle connections"
-                  << std::endl;
+        // std::cout << "[RedisConnectionPool] Recycled " << recycled << " idle connections"
+        //           << std::endl;
     }
 }
 
@@ -498,7 +441,7 @@ int RedisConnectionPool::get_timeout() const
 PoolStatistics RedisConnectionPool::get_statistics() const
 {
     std::lock_guard<std::mutex> lock(m_stats_mutex);
-    PoolStatistics stats = m_stats;
+    PoolStatistics              stats = m_stats;
     return stats;
 }
 

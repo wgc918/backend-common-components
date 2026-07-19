@@ -117,9 +117,6 @@ private:
     void destroy_connection(sw::redis::Redis* conn);
 
 private:
-    // ---- 单例管理 ----
-    static std::mutex             s_instance_mutex;
-    static RedisConnectionPool*   s_instance;
 
     // ---- 连接队列 ----
     /// 连接队列元素：连接指针 + 最后使用时间
