@@ -9,6 +9,8 @@
 /// 6. RAII 守卫：通过 RedisConnGuard 自动归还连接，防止泄漏
 
 #pragma once
+#include <sw/redis++/redis++.h>
+
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -17,11 +19,12 @@
 #include <thread>
 #include <utility>
 
-#include <sw/redis++/redis++.h>
-
 #include "PoolStatistics.h"
 #include "RedisConnectionFactory.h"
 #include "RedisHealthChecker.h"
+
+namespace rcp
+{
 
 class RedisConnGuard;
 
@@ -117,12 +120,11 @@ private:
     void destroy_connection(sw::redis::Redis* conn);
 
 private:
-
     // ---- 连接队列 ----
     /// 连接队列元素：连接指针 + 最后使用时间
     using ConnEntry = std::pair<sw::redis::Redis*, std::chrono::steady_clock::time_point>;
-    std::queue<ConnEntry> m_conn_queue;
-    std::mutex            m_mutex;
+    std::queue<ConnEntry>   m_conn_queue;
+    std::mutex              m_mutex;
     std::condition_variable m_cv_empty;
 
     // ---- 配置 ----
@@ -139,10 +141,12 @@ private:
     bool m_initialized;    // 是否已完成初始化
 
     // ---- 回收线程 ----
-    std::thread     m_recycle_thread;
+    std::thread       m_recycle_thread;
     std::atomic<bool> m_recycle_running;
 
     // ---- 统计信息 ----
     mutable std::mutex m_stats_mutex;
     PoolStatistics     m_stats;
 };
+
+}  // namespace rcp

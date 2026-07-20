@@ -7,6 +7,7 @@
 #include "../include/redis-pool/RedisConnGuard.h"
 #include "../include/redis-pool/RedisConnectionPool.h"
 
+using namespace rcp;
 using namespace std;
 
 mutex g_mutx;

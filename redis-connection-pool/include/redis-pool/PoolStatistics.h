@@ -2,6 +2,9 @@
 #include <chrono>
 #include <cstdint>
 
+namespace rcp
+{
+
 /// Redis 连接池运行统计信息
 /// 用于监控连接池的运行状态，支持性能调优和故障排查
 struct PoolStatistics
@@ -30,3 +33,5 @@ struct PoolStatistics
     std::chrono::system_clock::time_point created_at;  // 统计开始时间
     std::chrono::system_clock::time_point updated_at;  // 最后更新时间
 };
+
+}  // namespace rcp

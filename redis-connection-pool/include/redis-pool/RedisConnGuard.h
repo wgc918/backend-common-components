@@ -2,6 +2,9 @@
 
 #include <sw/redis++/redis++.h>
 
+namespace rcp
+{
+
 class RedisConnectionPool;
 
 /// Redis 连接守卫（RAII）
@@ -49,3 +52,5 @@ private:
     sw::redis::Redis*    m_conn;      // 持有的连接
     bool                 m_released;  // 是否已归还
 };
+
+} // namespace rcp

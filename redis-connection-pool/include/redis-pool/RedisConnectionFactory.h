@@ -3,6 +3,9 @@
 
 #include <sw/redis++/redis++.h>
 
+namespace rcp
+{
+
 /// Redis 连接配置参数
 struct RedisConnectionConfig
 {
@@ -26,3 +29,5 @@ public:
     /// @throws sw::redis::Error 连接创建失败时抛出异常
     sw::redis::Redis* create_connection(const RedisConnectionConfig& cfg);
 };
+
+} // namespace rcp

@@ -2,6 +2,9 @@
 
 #include <sw/redis++/redis++.h>
 
+namespace rcp
+{
+
 /// 健康检查状态
 enum class HealthStatus
 {
@@ -26,3 +29,5 @@ public:
 private:
     int m_timeout_ms = 3000;  // 默认 3 秒超时
 };
+
+} // namespace rcp

@@ -5,6 +5,9 @@
 
 #include "../include/redis-pool/RedisConnGuard.h"
 
+namespace rcp
+{
+
 /// 获取连接池单例
 /// @return 全局唯一连接池实例引用
 RedisConnectionPool& RedisConnectionPool::instance()
@@ -477,3 +480,5 @@ void RedisConnectionPool::shutdown()
         m_stats.updated_at         = std::chrono::system_clock::now();
     }
 }
+
+}  // namespace rcp

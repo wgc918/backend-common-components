@@ -1,6 +1,9 @@
 #include "../include/redis-pool/RedisConnGuard.h"
 #include "../include/redis-pool/RedisConnectionPool.h"
 
+namespace rcp
+{
+
 /// 从连接池借出连接
 /// @param pool 连接池引用
 /// @param conn 借出的连接（调用方确保非空或为 nullptr 表示借出失败）
@@ -82,3 +85,5 @@ void RedisConnGuard::release()
         m_pool     = nullptr;
     }
 }
+
+} // namespace rcp

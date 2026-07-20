@@ -1,5 +1,8 @@
 #include "../include/redis-pool/RedisHealthChecker.h"
 
+namespace rcp
+{
+
 HealthStatus RedisHealthChecker::check(sw::redis::Redis* conn)
 {
     if (conn == nullptr)
@@ -20,3 +23,5 @@ void RedisHealthChecker::set_timeout_ms(int timeout_ms)
 {
     m_timeout_ms = timeout_ms;
 }
+
+}  // namespace rcp

@@ -1,5 +1,8 @@
 #include "../include/redis-pool/RedisConnectionFactory.h"
 
+namespace rcp
+{
+
 sw::redis::Redis* RedisConnectionFactory::create_connection(const RedisConnectionConfig& cfg)
 {
     // 配置连接选项
@@ -18,3 +21,5 @@ sw::redis::Redis* RedisConnectionFactory::create_connection(const RedisConnectio
 
     return new sw::redis::Redis(opts, pool_opts);
 }
+
+}  // namespace rcp
