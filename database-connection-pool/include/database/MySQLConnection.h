@@ -15,6 +15,9 @@
 #include "IDatabaseConnection.h"
 #include "MySQLResultSet.h"
 
+namespace dcp
+{
+
 /// MySQL 数据库连接实现
 class MySQLConnection : public IDatabaseConnection
 {
@@ -69,3 +72,5 @@ private:
     bool                    m_pre;
     bool                    m_transaction;
 };
+
+} // namespace dcp

@@ -5,6 +5,9 @@
 
 #include "IResultSet.h"
 
+namespace dcp
+{
+
 struct ConnectionConfig
 {
     std::string db_name;
@@ -84,3 +87,5 @@ public:
 protected:
     ConnectionConfig m_cfg;
 };
+
+} // namespace dcp

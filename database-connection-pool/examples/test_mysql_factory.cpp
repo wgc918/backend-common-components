@@ -1,5 +1,7 @@
 #include "../include/database/MySQLFactory.h"
 
+using namespace dcp;
+
 void func(IDatabaseConnection* mconn)
 {
     const char* create_sql = "create table test1 (id int,name varchar(10));";

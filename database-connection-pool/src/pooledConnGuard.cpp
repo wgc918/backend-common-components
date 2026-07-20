@@ -1,5 +1,8 @@
 #include "../include//conn-pool/pooledConnGuard.h"
 
+namespace dcp
+{
+
 /// 从连接池借出连接
 /// @param pool 连接池引用
 /// @param conn 借出的连接（调用方确保非空）
@@ -73,3 +76,5 @@ void PooledConnGuard::release()
         m_released = true;
     }
 }
+
+} // namespace dcp

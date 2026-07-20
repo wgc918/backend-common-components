@@ -1,5 +1,8 @@
 #pragma once
 
+namespace dcp
+{
+
 /// 支持的数据库类型枚举
 /// 用于 ConnectionPool 按数据库类型区分单例实例
 enum class DatabaseType
@@ -10,3 +13,5 @@ enum class DatabaseType
     Oracle,      // Oracle
     SQLServer,   // Microsoft SQL Server
 };
+
+}  // namespace dcp

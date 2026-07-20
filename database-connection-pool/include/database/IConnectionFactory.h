@@ -4,6 +4,9 @@
 #include "DatabaseType.h"
 #include "IDatabaseConnection.h"
 
+namespace dcp
+{
+
 /// 连接工厂抽象接口
 /// 每种数据库类型对应一个具体工厂实现，负责创建对应的数据库连接
 class IConnectionFactory
@@ -19,3 +22,5 @@ public:
     /// 返回当前工厂对应的数据库类型
     virtual DatabaseType get_database_type() const = 0;
 };
+
+} // namespace dcp

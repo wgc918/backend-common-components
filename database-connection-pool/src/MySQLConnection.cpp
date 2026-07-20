@@ -6,6 +6,9 @@
 #include <cassert>
 #include <string>
 
+namespace dcp
+{
+
 MySQLConnection::MySQLConnection(const ConnectionConfig& cfg)
     : IDatabaseConnection(cfg), m_pstmt(nullptr), m_pre(false), m_transaction(false)
 {
@@ -247,3 +250,5 @@ uint64_t MySQLConnection::last_insert_id()
 {
     return 0;
 }
+
+} // namespace dcp

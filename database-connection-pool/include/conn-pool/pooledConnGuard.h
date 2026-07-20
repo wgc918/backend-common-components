@@ -4,6 +4,9 @@
 #include "../database/IDatabaseConnection.h"
 #include "ConnectionPool.h"
 
+namespace dcp
+{
+
 /// 连接守卫（RAII）
 /// 从连接池获取连接后，由 PooledConnGuard 持有；
 /// 析构时自动将连接归还给连接池，防止连接泄漏。
@@ -49,3 +52,5 @@ private:
     IDatabaseConnection* m_conn;      // 持有的连接
     bool                 m_released;  // 是否已归还
 };
+
+} // namespace dcp

@@ -7,6 +7,9 @@
 #include "../include/database/MySQLFactory.h"
 #include "../include/monitor/MySQLHealthChecker.h"
 
+namespace dcp
+{
+
 // 静态成员变量定义
 std::mutex                                        ConnectionPool::s_instance_mutex;
 std::unordered_map<DatabaseType, ConnectionPool*> ConnectionPool::s_instances;
@@ -250,8 +253,8 @@ ConnectionPool::~ConnectionPool()
 {
     if (m_factory != nullptr)
         delete m_factory;
-    //if (m_health_checker != nullptr)
-       // delete m_health_checker;
+    // if (m_health_checker != nullptr)
+    //  delete m_health_checker;
 }
 
 void ConnectionPool::return_connection(IDatabaseConnection* conn)
@@ -270,3 +273,5 @@ void ConnectionPool::return_connection(IDatabaseConnection* conn)
         delete conn;
     }
 }
+
+}  // namespace dcp

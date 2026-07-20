@@ -2,6 +2,9 @@
 #include "IConnectionFactory.h"
 #include "MySQLConnection.h"
 
+namespace dcp
+{
+
 class MySQLFactory : public IConnectionFactory
 {
 public:
@@ -15,3 +18,5 @@ public:
     /// 返回当前工厂对应的数据库类型
     DatabaseType get_database_type() const override;
 };
+
+} // namespace dcp

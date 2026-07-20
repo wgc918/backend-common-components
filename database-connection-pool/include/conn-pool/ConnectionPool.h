@@ -19,6 +19,9 @@
 #include "../monitor/IHealthChecker.h"
 #include "../monitor/PoolStatistics.h"
 
+namespace dcp
+{
+
 class PooledConnGuard;
 
 class ConnectionPool
@@ -86,13 +89,13 @@ private:
     std::queue<IDatabaseConnection*> m_conn_queue;
     std::mutex                       m_mutex;
     std::condition_variable          m_cv_empty;
-    //std::condition_variable          m_cv_full;
+    // std::condition_variable          m_cv_full;
 
     // ---- 配置 ----
     DatabaseType        m_db_type;
     ConnectionConfig    m_cfg;
     IConnectionFactory* m_factory;
-    //IHealthChecker*     m_health_checker;
+    // IHealthChecker*     m_health_checker;
 
     int  m_min_size;       // 连接池维护的最小连接数
     int  m_max_size;       // 连接池维护的最大连接数
@@ -102,3 +105,5 @@ private:
     int  m_current_size;   // 当前总连接数（包括已借出和在队列中的）
     bool m_initialized;    // 是否已完成初始化=
 };
+
+}  // namespace dcp

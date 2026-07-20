@@ -1,5 +1,7 @@
 #include "../include/database/MySQLConnection.h"
 
+using namespace dcp;
+
 int main()
 {
     ConnectionConfig cfg;

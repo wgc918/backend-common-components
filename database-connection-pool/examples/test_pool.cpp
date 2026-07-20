@@ -7,6 +7,8 @@
 #include "../include/conn-pool/ConnectionPool.h"
 #include "../include/conn-pool/pooledConnGuard.h"
 
+using namespace dcp;
+
 std::mutex cout_mutex;
 
 void func(PooledConnGuard mconn, int id)

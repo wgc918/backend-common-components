@@ -7,6 +7,9 @@
 
 #include "IResultSet.h"
 
+namespace dcp
+{
+
 /// MySQL 查询结果集实现
 class MySQLResultSet : public IResultSet
 {
@@ -49,3 +52,5 @@ public:
 private:
     sql::ResultSet* m_res;
 };
+
+} // namespace dcp

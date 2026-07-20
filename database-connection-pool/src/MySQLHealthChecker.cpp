@@ -6,6 +6,9 @@
 
 #include "../include/database/MySQLConnection.h"
 
+namespace dcp
+{
+
 MySQLHealthChecker::MySQLHealthChecker() : m_timeout_ms(5000)
 {
 }
@@ -41,3 +44,5 @@ void MySQLHealthChecker::set_timeout_ms(int timeout_ms)
 {
     m_timeout_ms = timeout_ms;
 }
+
+} // namespace dcp

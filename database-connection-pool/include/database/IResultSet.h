@@ -3,6 +3,9 @@
 #include <cstdint>
 #include <string>
 
+namespace dcp
+{
+
 /// 查询结果集抽象接口
 /// 提供统一的游标遍历和字段读取能力
 class IResultSet
@@ -50,3 +53,5 @@ public:
     virtual bool is_null(const std::string& column_name) = 0;
     virtual bool is_null(uint16_t column_index)          = 0;
 };
+
+} // namespace dcp

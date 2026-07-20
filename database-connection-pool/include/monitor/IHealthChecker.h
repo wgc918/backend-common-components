@@ -2,6 +2,9 @@
 
 #include "../database/IDatabaseConnection.h"
 
+namespace dcp
+{
+
 /// 健康检查状态
 enum class HealthStatus
 {
@@ -25,3 +28,5 @@ public:
     /// 设置健康检查超时时间（毫秒）
     virtual void set_timeout_ms(int timeout_ms) = 0;
 };
+
+} // namespace dcp

@@ -2,6 +2,9 @@
 
 #include <cstddef>
 
+namespace dcp
+{
+
 MySQLResultSet::MySQLResultSet(sql::ResultSet* res) : m_res(res)
 {
 }
@@ -136,3 +139,5 @@ bool MySQLResultSet::is_null(uint16_t column_index)
 {
     return m_res->isNull(column_index);
 }
+
+} // namespace dcp
