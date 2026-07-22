@@ -52,34 +52,35 @@ DeductResult RedisLuaManager::parse_result(const std::vector<sw::redis::Optional
         return result;
     }
 
-    int code = std::stoi(*reply[0]);
+    int code               = std::stoi(*reply[0]);
     result.remaining_stock = std::stoi(*reply[1]);
 
     switch (code)
     {
-    case -1:
-        result.result = LuaResult::KeyNotFound;
-        break;
-    case 0:
-        result.result = LuaResult::StockInsufficient;
-        break;
-    case 1:
-        result.result = LuaResult::DeductSuccess;
-        break;
-    default:
-        LOGW("Lua script returned unknown code: %d", code);
-        break;
+        case -1:
+            result.result = LuaResult::KeyNotFound;
+            break;
+        case 0:
+            result.result = LuaResult::StockInsufficient;
+            break;
+        case 1:
+            result.result = LuaResult::DeductSuccess;
+            break;
+        default:
+            LOGW("Lua script returned unknown code: %d", code);
+            break;
     }
 
     return result;
 }
 
 DeductResult RedisLuaManager::execute_deduct(sw::redis::Redis& redis, const std::string& key,
-                                              int qty)
+                                             int qty)
 {
     try
     {
-        auto reply = redis.eval(deduct_script(), {key}, {std::to_string(qty)});
+        auto reply = redis.eval<std::vector<sw::redis::OptionalString>>(deduct_script(), {key},
+                                                                        {std::to_string(qty)});
         return parse_result(reply);
     }
     catch (const sw::redis::Error& e)

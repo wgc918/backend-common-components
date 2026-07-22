@@ -120,8 +120,8 @@ bool App::init_database_pool()
     cfg.password  = m_config.mysql_password;
 
     auto& pool = dcp::ConnectionPool::instance(dcp::DatabaseType::MySQL);
-    pool.init(cfg, m_config.mysql_min_size, m_config.mysql_max_size,
-              m_config.mysql_max_idle_time, m_config.mysql_timeout, m_config.mysql_op_num);
+    pool.init(cfg, m_config.mysql_min_size, m_config.mysql_max_size, m_config.mysql_max_idle_time,
+              m_config.mysql_timeout, m_config.mysql_op_num);
 
     LOGI("MySQL connection pool initialized. host=%s:%d, db=%s", m_config.mysql_host.c_str(),
          m_config.mysql_port, m_config.mysql_database.c_str());
@@ -143,8 +143,8 @@ bool App::init_redis_pool()
     cfg.socket_timeout  = m_config.redis_socket_timeout;
 
     auto& pool = rcp::RedisConnectionPool::instance();
-    pool.init(cfg, m_config.redis_min_size, m_config.redis_max_size,
-              m_config.redis_max_idle_time, m_config.redis_timeout, m_config.redis_op_num);
+    pool.init(cfg, m_config.redis_min_size, m_config.redis_max_size, m_config.redis_max_idle_time,
+              m_config.redis_timeout, m_config.redis_op_num);
 
     LOGI("Redis connection pool initialized. host=%s:%d, db=%d", m_config.redis_host.c_str(),
          m_config.redis_port, m_config.redis_db);
@@ -220,7 +220,7 @@ bool App::init(const std::string& config_path)
     auto& mysql_pool = dcp::ConnectionPool::instance(dcp::DatabaseType::MySQL);
     auto& redis_pool = rcp::RedisConnectionPool::instance();
 
-    m_repository = std::make_shared<InventoryRepository>(mysql_pool);
+    m_repository        = std::make_shared<InventoryRepository>(mysql_pool);
     m_inventory_service = std::make_shared<InventoryService>(
         redis_pool, *m_repository, m_config.stock_key_prefix, m_config.retry_times);
     m_bootstrap = std::make_shared<Bootstrap>(*m_inventory_service);
@@ -253,22 +253,23 @@ void App::run()
     app.addListener("0.0.0.0", static_cast<uint16_t>(m_config.server_port));
     app.setThreadNum(m_config.thread_pool_size);
 
-    LOGI("Starting Drogon HTTP server on port %d with %d threads...",
-         m_config.server_port, m_config.thread_pool_size);
+    LOGI("Starting Drogon HTTP server on port %d with %d threads...", m_config.server_port,
+         m_config.thread_pool_size);
 
-    // 注册生命周期回调：停止时清理资源
-    app.setPreShutdownAdvice(
-        []()
-        {
-            LOGI("Drogon pre-shutdown: cleaning up resources...");
-            rcp::RedisConnectionPool::instance().shutdown();
-            dcp::ConnectionPool::instance(dcp::DatabaseType::MySQL).shutdown();
-            Logger::instance().shutdown();
-            LOGI("=== Application stopped ===");
-        });
+    auto cleanup_resources = []()
+    {
+        LOGI("Cleaning up resources...");
+        rcp::RedisConnectionPool::instance().shutdown();
+        dcp::ConnectionPool::instance(dcp::DatabaseType::MySQL).shutdown();
+        Logger::instance().shutdown();
+        LOGI("=== Application stopped ===");
+    };
 
-    // 阻塞运行
+    app.setTermSignalHandler(cleanup_resources);
+
     app.run();
+
+    cleanup_resources();
 }
 
 }  // namespace demo1
