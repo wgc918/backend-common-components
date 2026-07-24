@@ -60,8 +60,7 @@ Result<int, ef::Error> InventoryRepository::deduct_stock(int64_t item_id, int qt
         guard->begin();
 
         // 使用悲观锁防止并发更新丢失
-        guard->prepare_statement(
-            "SELECT stock FROM inventory WHERE item_id = ? FOR UPDATE");
+        guard->prepare_statement("SELECT stock FROM inventory WHERE item_id = ? FOR UPDATE");
         guard->set_int64(1, item_id);
         auto* rs = guard->execute_query();
 
@@ -81,8 +80,7 @@ Result<int, ef::Error> InventoryRepository::deduct_stock(int64_t item_id, int qt
         }
 
         int new_stock = current - qty;
-        guard->prepare_statement(
-            "UPDATE inventory SET stock = ? WHERE item_id = ?");
+        guard->prepare_statement("UPDATE inventory SET stock = ? WHERE item_id = ?");
         guard->set_int(1, new_stock);
         guard->set_int64(2, item_id);
         guard->execute_update();
@@ -92,13 +90,6 @@ Result<int, ef::Error> InventoryRepository::deduct_stock(int64_t item_id, int qt
     }
     catch (const std::exception& e)
     {
-        try
-        {
-            guard->rollback();
-        }
-        catch (...)
-        {
-        }
         return EF_ERROR(kMySQLUpdateFailed, "deduct_stock failed for item_id=%lld: %s",
                         static_cast<long long>(item_id), e.what());
     }
@@ -132,19 +123,20 @@ Result<int, ef::Error> InventoryRepository::get_stock(int64_t item_id)
     }
 }
 
+// 注意：调用方需要负责 commit/rollback
 Result<int, ef::Error> InventoryRepository::get_stock_for_update(int64_t item_id)
 {
     auto guard = m_pool.get_connection();
     if (!guard)
     {
-        return EF_ERROR(kMySQLUnavailable, "Failed to get MySQL connection for get_stock_for_update");
+        return EF_ERROR(kMySQLUnavailable,
+                        "Failed to get MySQL connection for get_stock_for_update");
     }
 
     try
     {
         guard->begin();
-        guard->prepare_statement(
-            "SELECT stock FROM inventory WHERE item_id = ? FOR UPDATE");
+        guard->prepare_statement("SELECT stock FROM inventory WHERE item_id = ? FOR UPDATE");
         guard->set_int64(1, item_id);
         auto* rs = guard->execute_query();
 
@@ -159,13 +151,6 @@ Result<int, ef::Error> InventoryRepository::get_stock_for_update(int64_t item_id
     }
     catch (const std::exception& e)
     {
-        try
-        {
-            guard->rollback();
-        }
-        catch (...)
-        {
-        }
         return EF_ERROR(kMySQLUpdateFailed, "get_stock_for_update failed: %s", e.what());
     }
 }
@@ -180,8 +165,7 @@ Result<void, ef::Error> InventoryRepository::update_stock(int64_t item_id, int n
 
     try
     {
-        guard->prepare_statement(
-            "UPDATE inventory SET stock = ? WHERE item_id = ?");
+        guard->prepare_statement("UPDATE inventory SET stock = ? WHERE item_id = ?");
         guard->set_int(1, new_stock);
         guard->set_int64(2, item_id);
         int rows = guard->execute_update();
