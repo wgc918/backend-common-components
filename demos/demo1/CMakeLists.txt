@@ -53,6 +53,7 @@ set(DEMO_SRC
     src/bootstrap.cpp
     src/inventory_service.cpp
     src/inventory_controller.cpp
+    src/inventory_repository.cpp
     src/concurrent_test.cpp
     src/consistency_checker.cpp
     src/redis_lua.cpp
@@ -92,6 +93,8 @@ target_include_directories(demo1_inventory PRIVATE
 )
 
 target_link_libraries(demo1_inventory
+    ${DROGON_LIBRARY}
+    ${TRANTOR_LIBRARY}
     redis++ 
     hiredis 
     pthread
@@ -99,6 +102,7 @@ target_link_libraries(demo1_inventory
     ssl
     crypto
     uuid
+    mysqlcppconn
 )
 
 # 复制配置文件到构建目录
