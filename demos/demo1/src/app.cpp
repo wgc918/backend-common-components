@@ -252,7 +252,13 @@ void App::run()
     auto& app = drogon::app();
     app.addListener("0.0.0.0", static_cast<uint16_t>(m_config.server_port));
     app.setThreadNum(m_config.thread_pool_size);
-
+    app.registerPostHandlingAdvice(
+        [](const drogon::HttpRequestPtr& req, const drogon::HttpResponsePtr& resp)
+        {
+            LOGI("%s %s  %d (client: %s:%u)", req->getMethodString(),
+                 req->getPath().c_str(), static_cast<int>(resp->getStatusCode()),
+                 req->getPeerAddr().toIp().c_str(), req->getPeerAddr().toPort());
+        });
     LOGI("Starting Drogon HTTP server on port %d with %d threads...", m_config.server_port,
          m_config.thread_pool_size);
 
