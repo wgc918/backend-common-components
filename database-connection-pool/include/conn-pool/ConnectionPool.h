@@ -8,10 +8,14 @@
 ///
 
 #pragma once
+#include <atomic>
+#include <chrono>
 #include <condition_variable>
 #include <mutex>
 #include <queue>
+#include <thread>
 #include <unordered_map>
+#include <utility>
 
 #include "../database/DatabaseType.h"
 #include "../database/IConnectionFactory.h"
@@ -80,15 +84,29 @@ private:
     void source_connections();
     void expand_connections();  // 扩容连接池
 
+    /// 启动空闲连接回收线程
+    void start_recycle_thread();
+
+    /// 停止空闲连接回收线程
+    void stop_recycle_thread();
+
+    /// 回收超时空闲连接（由回收线程调用）
+    void recycle_idle_connections();
+
+    /// 销毁一个连接并更新计数
+    void destroy_connection(IDatabaseConnection* conn);
+
 private:
     // ---- 多类型单例管理 ----
     static std::mutex                                        s_instance_mutex;
     static std::unordered_map<DatabaseType, ConnectionPool*> s_instances;
 
     // ---- 连接管理 ----
-    std::queue<IDatabaseConnection*> m_conn_queue;
-    std::mutex                       m_mutex;
-    std::condition_variable          m_cv_empty;
+    /// 连接队列元素：连接指针 + 最后使用时间
+    using ConnEntry = std::pair<IDatabaseConnection*, std::chrono::steady_clock::time_point>;
+    std::queue<ConnEntry>   m_conn_queue;
+    std::mutex              m_mutex;
+    std::condition_variable m_cv_empty;
     // std::condition_variable          m_cv_full;
 
     // ---- 配置 ----
@@ -104,6 +122,10 @@ private:
     int  m_op_num;         // 一次增加或减少的连接数
     int  m_current_size;   // 当前总连接数（包括已借出和在队列中的）
     bool m_initialized;    // 是否已完成初始化=
+
+    // ---- 回收线程 ----
+    std::thread       m_recycle_thread;
+    std::atomic<bool> m_recycle_running;
 };
 
 }  // namespace dcp

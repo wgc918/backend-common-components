@@ -19,7 +19,7 @@ MySQLConnection::MySQLConnection(const ConnectionConfig& cfg)
     m_stmt = m_conn->createStatement();
     m_conn->setSchema(cfg.db_name);
 
-    std::cout << "connection success" << std::endl;
+    //std::cout << "connection success" << std::endl;
 }
 
 MySQLConnection::~MySQLConnection()

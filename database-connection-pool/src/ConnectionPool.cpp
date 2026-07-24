@@ -1,5 +1,6 @@
 #include "../include/conn-pool/ConnectionPool.h"
 
+#include <iostream>
 #include <mutex>
 #include <thread>
 
@@ -53,6 +54,7 @@ void ConnectionPool::init(const ConnectionConfig& cfg)
     m_cfg         = cfg;
     m_initialized = true;
     source_connections();
+    start_recycle_thread();
 }
 
 void ConnectionPool::init(const ConnectionConfig& cfg, int min, int max, int idle_time, int timeout,
@@ -66,6 +68,7 @@ void ConnectionPool::init(const ConnectionConfig& cfg, int min, int max, int idl
     m_timeout       = timeout;
     m_op_num        = op_num;
     source_connections();
+    start_recycle_thread();
 }
 
 PooledConnGuard ConnectionPool::get_connection()
@@ -100,7 +103,7 @@ PooledConnGuard ConnectionPool::get_connection()
     // 获取连接
     if (!m_conn_queue.empty())
     {
-        PooledConnGuard ret(this, m_conn_queue.front());
+        PooledConnGuard ret(this, m_conn_queue.front().first);
         m_conn_queue.pop();
         return ret;
     }
@@ -113,7 +116,8 @@ void ConnectionPool::source_connections()
 {
     for (int i = 0; i < m_min_size; i++)
     {
-        m_conn_queue.push(m_factory->create_connection(m_cfg));
+        m_conn_queue.push(
+            std::make_pair(m_factory->create_connection(m_cfg), std::chrono::steady_clock::now()));
         m_current_size++;
     }
 }
@@ -131,7 +135,8 @@ void ConnectionPool::expand_connections()
 
     for (int i = 0; i < to_create; i++)
     {
-        m_conn_queue.push(m_factory->create_connection(m_cfg));
+        m_conn_queue.push(
+            std::make_pair(m_factory->create_connection(m_cfg), std::chrono::steady_clock::now()));
         m_current_size++;
     }
 }
@@ -188,12 +193,15 @@ PoolStatistics ConnectionPool::get_statistics() const
 /// 关闭连接池，释放所有连接
 void ConnectionPool::shutdown()
 {
+    // 先停止回收线程
+    stop_recycle_thread();
+
     std::lock_guard<std::mutex> lock(m_mutex);
 
     // 释放队列中的所有连接
     while (!m_conn_queue.empty())
     {
-        IDatabaseConnection* conn = m_conn_queue.front();
+        IDatabaseConnection* conn = m_conn_queue.front().first;
         m_conn_queue.pop();
         if (conn != nullptr)
         {
@@ -220,7 +228,8 @@ ConnectionPool::ConnectionPool(DatabaseType type)
       m_timeout(10),
       m_op_num(4),
       m_current_size(0),
-      m_initialized(false)
+      m_initialized(false),
+      m_recycle_running(false)
 {
     switch (type)
     {
@@ -257,12 +266,91 @@ ConnectionPool::~ConnectionPool()
     //  delete m_health_checker;
 }
 
+// ---- 回收线程 ----
+
+void ConnectionPool::start_recycle_thread()
+{
+    if (m_recycle_running)
+    {
+        return;  // 已经在运行
+    }
+
+    m_recycle_running = true;
+    m_recycle_thread  = std::thread(
+        [this]()
+        {
+            while (m_recycle_running)
+            {
+                // 每 30 秒检查一次
+                std::this_thread::sleep_for(std::chrono::seconds(30));
+                if (m_recycle_running)
+                {
+                    recycle_idle_connections();
+                }
+            }
+        });
+}
+
+void ConnectionPool::stop_recycle_thread()
+{
+    m_recycle_running = false;
+    if (m_recycle_thread.joinable())
+        m_recycle_thread.join();
+}
+
+void ConnectionPool::recycle_idle_connections()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    auto now        = std::chrono::steady_clock::now();
+    int  queue_size = static_cast<int>(m_conn_queue.size());
+
+    // 计算可以回收的连接数（保留至少 m_min_size 个连接）
+    int can_recycle = queue_size - m_min_size;
+    if (can_recycle <= 0)
+    {
+        return;
+    }
+
+    int recycled = 0;
+    for (int i = 0; i < queue_size && recycled < can_recycle; i++)
+    {
+        auto& entry = m_conn_queue.front();
+        auto  idle_duration =
+            std::chrono::duration_cast<std::chrono::seconds>(now - entry.second).count();
+
+        if (idle_duration >= m_max_idle_time)
+        {
+            // 回收空闲过久的连接
+            IDatabaseConnection* conn = entry.first;
+            m_conn_queue.pop();
+            destroy_connection(conn);
+            recycled++;
+        }
+        else
+        {
+            // 把还没超时的连接放回队列末尾
+            m_conn_queue.pop();
+            m_conn_queue.push(entry);
+        }
+    }
+}
+
+void ConnectionPool::destroy_connection(IDatabaseConnection* conn)
+{
+    if (conn != nullptr)
+    {
+        delete conn;
+        m_current_size--;
+    }
+}
+
 void ConnectionPool::return_connection(IDatabaseConnection* conn)
 {
     if (conn != nullptr && conn->is_valid())
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        m_conn_queue.push(conn);
+        m_conn_queue.push(std::make_pair(conn, std::chrono::steady_clock::now()));
         m_cv_empty.notify_one();
     }
     else if (conn != nullptr)
