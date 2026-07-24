@@ -43,7 +43,7 @@ public:
     /// @brief 解析 Lua 脚本返回值
     /// @param reply  Redis Eval 返回的 vector
     /// @return 解析后的扣减结果
-    static DeductResult parse_result(const std::vector<sw::redis::OptionalString>& reply);
+    static DeductResult parse_result(const std::vector<sw::redis::OptionalLongLong>& reply);
 
     /// @brief 执行原子库存扣减
     /// @param redis Redis 连接

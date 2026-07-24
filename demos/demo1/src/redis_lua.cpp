@@ -35,7 +35,7 @@ return {1, new_stock}
 )LUA";
 }
 
-DeductResult RedisLuaManager::parse_result(const std::vector<sw::redis::OptionalString>& reply)
+DeductResult RedisLuaManager::parse_result(const std::vector<sw::redis::OptionalLongLong>& reply)
 {
     DeductResult result{};
     result.result = LuaResult::KeyNotFound;
@@ -52,8 +52,8 @@ DeductResult RedisLuaManager::parse_result(const std::vector<sw::redis::Optional
         return result;
     }
 
-    int code               = std::stoi(*reply[0]);
-    result.remaining_stock = std::stoi(*reply[1]);
+    int code               = static_cast<int>(*reply[0]);
+    result.remaining_stock = static_cast<int>(*reply[1]);
 
     switch (code)
     {
@@ -79,8 +79,8 @@ DeductResult RedisLuaManager::execute_deduct(sw::redis::Redis& redis, const std:
 {
     try
     {
-        auto reply = redis.eval<std::vector<sw::redis::OptionalString>>(deduct_script(), {key},
-                                                                        {std::to_string(qty)});
+        auto reply = redis.eval<std::vector<sw::redis::OptionalLongLong>>(deduct_script(), {key},
+                                                                          {std::to_string(qty)});
         return parse_result(reply);
     }
     catch (const sw::redis::Error& e)
