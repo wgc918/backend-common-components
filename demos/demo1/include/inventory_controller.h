@@ -18,7 +18,7 @@ namespace demo1
 
 /// @brief 库存控制器 — Drogon HttpController 实现
 /// 负责请求解析、参数校验、响应格式化，不包含业务逻辑
-class InventoryController : public drogon::HttpController<InventoryController>
+class InventoryController : public drogon::HttpController<InventoryController, false>
 {
 public:
     /// @param service 库存业务服务（shared_ptr，与 App 共享生命周期）
@@ -39,17 +39,16 @@ public:
 
 private:
     /// @brief 扣减库存
-    void deduct(const drogon::HttpRequestPtr& req,
+    void deduct(const drogon::HttpRequestPtr&                         req,
                 std::function<void(const drogon::HttpResponsePtr&)>&& callback);
 
     /// @brief 并发测试
-    void concurrent_test(const drogon::HttpRequestPtr& req,
+    void concurrent_test(const drogon::HttpRequestPtr&                         req,
                          std::function<void(const drogon::HttpResponsePtr&)>&& callback);
 
     /// @brief 一致性检查
-    void check(const drogon::HttpRequestPtr& req,
-               std::function<void(const drogon::HttpResponsePtr&)>&& callback,
-               int64_t item_id);
+    void check(const drogon::HttpRequestPtr&                         req,
+               std::function<void(const drogon::HttpResponsePtr&)>&& callback, int64_t item_id);
 
     /// @brief 构建 JSON 成功响应
     static drogon::HttpResponsePtr make_ok(const std::string& data);
