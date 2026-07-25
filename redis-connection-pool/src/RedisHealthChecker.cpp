@@ -11,11 +11,19 @@ HealthStatus RedisHealthChecker::check(sw::redis::Redis* conn)
     }
 
     // 发送 PING 命令检测连接是否正常
-    auto reply = conn->ping();
-    if (reply == "PONG")
+    try
     {
-        return HealthStatus::Healthy;
+        auto reply = conn->ping();
+        if (reply == "PONG")
+        {
+            return HealthStatus::Healthy;
+        }
     }
+    catch (const sw::redis::Error& e)
+    {
+        return HealthStatus::Unhealthy;
+    }
+
     return HealthStatus::Unknown;
 }
 

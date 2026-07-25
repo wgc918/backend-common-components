@@ -1,5 +1,7 @@
 #include "../include/redis-pool/RedisConnectionFactory.h"
 
+#include <iostream>
+
 namespace rcp
 {
 
@@ -19,7 +21,25 @@ sw::redis::Redis* RedisConnectionFactory::create_connection(const RedisConnectio
     sw::redis::ConnectionPoolOptions pool_opts;
     pool_opts.size = 1;  // 每个 Redis 对象内部连接池大小为 1
 
-    return new sw::redis::Redis(opts, pool_opts);
+    sw::redis::Redis* conn = nullptr;
+    try
+    {
+        conn = new sw::redis::Redis(opts, pool_opts);
+        if (m_checker.check(conn) != HealthStatus::Healthy)
+        {
+            //std::cerr << "[RedisConnectionFactory] Health check failed" << std::endl;
+            delete conn;
+            conn = nullptr;
+        }
+    }
+    catch (const sw::redis::Error& e)
+    {
+        std::cerr << "[RedisConnectionFactory] Failed to create Redis connection: " << e.what()
+                  << std::endl;
+        return nullptr;
+    }
+
+    return conn;
 }
 
 }  // namespace rcp
