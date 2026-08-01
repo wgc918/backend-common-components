@@ -69,6 +69,17 @@ size_t ChannelPool::available() const
     return m_channels.size();
 }
 
+size_t ChannelPool::size() const
+{
+    return m_channel_max;
+}
+
+
+Connection& ChannelPool::connection()
+{
+    return m_connection;
+}
+
 void ChannelPool::release(std::unique_ptr<Channel> channel)
 {
     if (!channel)

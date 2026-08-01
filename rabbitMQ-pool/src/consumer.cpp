@@ -149,4 +149,9 @@ void Consumer::consume_loop()
     guard->basic_cancel(m_consumer_tag);
 }
 
+bool Consumer::is_running() const
+{
+    return m_running.load();
+}
+
 }  // namespace rmq

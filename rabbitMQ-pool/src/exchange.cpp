@@ -21,4 +21,14 @@ bool Exchange::remove(Channel& channel, bool if_unused) const
     return channel.exchange_delete(m_cfg.name, if_unused);
 }
 
+const std::string& Exchange::name() const
+{
+    return m_cfg.name;
+}
+
+ExchangeType Exchange::type() const
+{
+    return m_cfg.type;
+}
+
 }  // namespace rmq

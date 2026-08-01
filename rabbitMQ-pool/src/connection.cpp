@@ -151,4 +151,9 @@ amqp_connection_state_t Connection::connection() const
     return m_conn;
 }
 
+std::mutex& Connection::mutex()
+{
+    return m_mutex;
+}
+
 }  // namespace rmq

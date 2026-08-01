@@ -38,6 +38,26 @@ ChannelGuard::~ChannelGuard()
     release();
 }
 
+Channel* ChannelGuard::operator->() const
+{
+    return m_channel.get();
+}
+
+Channel& ChannelGuard::operator*() const
+{
+    return *m_channel;
+}
+
+ChannelGuard::operator bool() const
+{
+    return m_channel != nullptr;
+}
+
+Channel* ChannelGuard::get() const
+{
+    return m_channel.get();
+}
+
 void ChannelGuard::release()
 {
     if (!m_released && m_channel && m_pool != nullptr)

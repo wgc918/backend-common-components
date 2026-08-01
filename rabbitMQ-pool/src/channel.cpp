@@ -10,7 +10,8 @@
 namespace rmq
 {
 
-Channel::Channel(Connection& conn, channel_id id) : m_connection(&conn), m_channel_id(id)
+Channel::Channel(Connection& conn, channel_id id)
+    : m_connection(&conn), m_channel_id(id), m_open(false)
 {
 }
 
@@ -95,7 +96,15 @@ bool Channel::close()
     return true;
 }
 
-// ---- Exchange 操作 ----
+bool Channel::is_open() const
+{
+    return m_open;
+}
+
+channel_id Channel::id() const
+{
+    return m_channel_id;
+}
 
 bool Channel::exchange_declare(const std::string& name, const std::string& type, bool passive,
                                bool durable, bool auto_delete, bool internal,
@@ -140,8 +149,6 @@ bool Channel::exchange_unbind(const std::string& destination, const std::string&
         amqp_cstring_bytes(source.c_str()), amqp_cstring_bytes(routing_key.c_str()), arguments);
     return check_rpc_reply("Unbinding exchange");
 }
-
-// ---- Queue 操作 ----
 
 bool Channel::queue_declare(const std::string& name, bool passive, bool durable, bool exclusive,
                             bool auto_delete, amqp_table_t arguments)
@@ -192,8 +199,6 @@ bool Channel::queue_purge(const std::string& queue)
     amqp_queue_purge(m_connection->connection(), m_channel_id, amqp_cstring_bytes(queue.c_str()));
     return check_rpc_reply("Purging queue");
 }
-
-// ---- 消息操作 ----
 
 bool Channel::basic_publish(const std::string& exchange, const std::string& routing_key,
                             const amqp_basic_properties_t* props, const amqp_bytes_t& body,
@@ -325,6 +330,11 @@ bool Channel::check_rpc_reply(const char* context)
         return false;
     }
     return true;
+}
+
+Connection& Channel::connection()
+{
+    return *m_connection;
 }
 
 }  // namespace rmq

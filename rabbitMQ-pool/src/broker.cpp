@@ -26,8 +26,8 @@ bool Broker::setup(Channel& channel)
     {
         if (!exchange.declare(channel))
         {
-            std::cerr << "[Error] Broker::setup: Failed to declare exchange '"
-                      << exchange.name() << "'" << std::endl;
+            std::cerr << "[Error] Broker::setup: Failed to declare exchange '" << exchange.name()
+                      << "'" << std::endl;
             all_ok = false;
         }
     }
@@ -37,8 +37,8 @@ bool Broker::setup(Channel& channel)
     {
         if (!queue.declare(channel))
         {
-            std::cerr << "[Error] Broker::setup: Failed to declare queue '"
-                      << queue.name() << "'" << std::endl;
+            std::cerr << "[Error] Broker::setup: Failed to declare queue '" << queue.name() << "'"
+                      << std::endl;
             all_ok = false;
             continue;  // 跳过此队列的绑定
         }
@@ -48,9 +48,9 @@ bool Broker::setup(Channel& channel)
         {
             if (!queue.bind(channel, binding.exchange, binding.routing_key))
             {
-                std::cerr << "[Error] Broker::setup: Failed to bind queue '"
-                          << queue.name() << "' to exchange '" << binding.exchange
-                          << "' with routing_key '" << binding.routing_key << "'" << std::endl;
+                std::cerr << "[Error] Broker::setup: Failed to bind queue '" << queue.name()
+                          << "' to exchange '" << binding.exchange << "' with routing_key '"
+                          << binding.routing_key << "'" << std::endl;
                 all_ok = false;
             }
         }
@@ -77,8 +77,8 @@ bool Broker::teardown(Channel& channel)
     {
         if (!queue.remove(channel, false, false))
         {
-            std::cerr << "[Error] Broker::teardown: Failed to remove queue '"
-                      << queue.name() << "'" << std::endl;
+            std::cerr << "[Error] Broker::teardown: Failed to remove queue '" << queue.name() << "'"
+                      << std::endl;
             all_ok = false;
         }
     }
@@ -88,13 +88,23 @@ bool Broker::teardown(Channel& channel)
     {
         if (!exchange.remove(channel, false))
         {
-            std::cerr << "[Error] Broker::teardown: Failed to remove exchange '"
-                      << exchange.name() << "'" << std::endl;
+            std::cerr << "[Error] Broker::teardown: Failed to remove exchange '" << exchange.name()
+                      << "'" << std::endl;
             all_ok = false;
         }
     }
 
     return all_ok;
+}
+
+const std::vector<Exchange>& Broker::exchanges() const
+{
+    return m_exchanges;
+}
+
+const std::vector<std::pair<Queue, std::vector<Binding>>>& Broker::queues() const
+{
+    return m_queues;
 }
 
 }  // namespace rmq

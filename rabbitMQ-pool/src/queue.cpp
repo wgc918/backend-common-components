@@ -9,8 +9,8 @@ Queue::Queue(QueueConfig cfg) : m_cfg(std::move(cfg))
 
 bool Queue::declare(Channel& channel) const
 {
-    return channel.queue_declare(m_cfg.name, false, m_cfg.durable,
-                                 m_cfg.exclusive, m_cfg.auto_delete, m_cfg.arguments);
+    return channel.queue_declare(m_cfg.name, false, m_cfg.durable, m_cfg.exclusive,
+                                 m_cfg.auto_delete, m_cfg.arguments);
 }
 
 bool Queue::remove(Channel& channel, bool if_unused, bool if_empty) const
@@ -33,6 +33,11 @@ bool Queue::unbind(Channel& channel, const std::string& exchange,
 bool Queue::purge(Channel& channel) const
 {
     return channel.queue_purge(m_cfg.name);
+}
+
+const std::string& Queue::name() const
+{
+    return m_cfg.name;
 }
 
 }  // namespace rmq
