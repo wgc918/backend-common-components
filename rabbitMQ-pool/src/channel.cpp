@@ -50,8 +50,6 @@ Channel::~Channel()
 
 bool Channel::open()
 {
-    std::lock_guard<std::mutex> lock(m_connection->mutex());
-
     amqp_connection_state_t conn = m_connection->connection();
     if (conn == nullptr)
     {
@@ -59,10 +57,13 @@ bool Channel::open()
         return false;
     }
 
-    amqp_channel_open(conn, m_channel_id);
-    if (!check_rpc_reply("Opening channel"))
     {
-        return false;
+        std::lock_guard<std::mutex> lock(m_connection->mutex());
+        amqp_channel_open(conn, m_channel_id);
+        if (!check_rpc_reply("Opening channel"))
+        {
+            return false;
+        }
     }
 
     m_open = true;
@@ -74,8 +75,6 @@ bool Channel::close()
     if (!m_open)
         return true;
 
-    std::lock_guard<std::mutex> lock(m_connection->mutex());
-
     amqp_connection_state_t conn = m_connection->connection();
     if (conn == nullptr)
     {
@@ -83,10 +82,13 @@ bool Channel::close()
         return false;
     }
 
-    amqp_channel_close(conn, m_channel_id, AMQP_REPLY_SUCCESS);
-    if (!check_rpc_reply("Closing channel"))
     {
-        return false;
+        std::lock_guard<std::mutex> lock(m_connection->mutex());
+        amqp_channel_close(conn, m_channel_id, AMQP_REPLY_SUCCESS);
+        if (!check_rpc_reply("Closing channel"))
+        {
+            return false;
+        }
     }
 
     m_open = false;
@@ -197,11 +199,15 @@ bool Channel::basic_publish(const std::string& exchange, const std::string& rout
                             const amqp_basic_properties_t* props, const amqp_bytes_t& body,
                             bool mandatory, bool immediate)
 {
-    std::lock_guard<std::mutex> lock(m_connection->mutex());
+    int result;
+    {
+        std::lock_guard<std::mutex> lock(m_connection->mutex());
 
-    int result = amqp_basic_publish(
-        m_connection->connection(), m_channel_id, amqp_cstring_bytes(exchange.c_str()),
-        amqp_cstring_bytes(routing_key.c_str()), mandatory ? 1 : 0, immediate ? 1 : 0, props, body);
+        result = amqp_basic_publish(m_connection->connection(), m_channel_id,
+                                    amqp_cstring_bytes(exchange.c_str()),
+                                    amqp_cstring_bytes(routing_key.c_str()), mandatory ? 1 : 0,
+                                    immediate ? 1 : 0, props, body);
+    }
 
     if (result != AMQP_STATUS_OK)
     {
@@ -270,15 +276,12 @@ void Channel::set_rpc_timeout(int timeout_ms)
     tv.tv_sec  = timeout_ms / 1000;
     tv.tv_usec = (timeout_ms % 1000) * 1000;
 
+    std::lock_guard<std::mutex> lock(m_connection->mutex());
     amqp_set_rpc_timeout(m_connection->connection(), &tv);
 }
 
 bool Channel::consume_message(amqp_envelope_t& envelope, int timeout_ms)
 {
-    std::lock_guard<std::mutex> lock(m_connection->mutex());
-
-    amqp_maybe_release_buffers(m_connection->connection());
-
     timeval  tv;
     timeval* tv_ptr = nullptr;
     if (timeout_ms >= 0)
@@ -288,7 +291,14 @@ bool Channel::consume_message(amqp_envelope_t& envelope, int timeout_ms)
         tv_ptr     = &tv;
     }
 
-    amqp_rpc_reply_t res = amqp_consume_message(m_connection->connection(), &envelope, tv_ptr, 0);
+    amqp_rpc_reply_t res;
+    {
+        std::lock_guard<std::mutex> lock(m_connection->mutex());
+
+        amqp_maybe_release_buffers(m_connection->connection());
+
+        res = amqp_consume_message(m_connection->connection(), &envelope, tv_ptr, 0);
+    }
 
     if (res.reply_type != AMQP_RESPONSE_NORMAL)
     {
