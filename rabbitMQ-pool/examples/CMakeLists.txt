@@ -1,49 +1,49 @@
 cmake_minimum_required(VERSION 3.16)
 
 # 设置项目名称
-project(rabbitmq_conn_pool_examples LANGUAGES CXX)
+project(rmq_pool_examples LANGUAGES CXX)
 
 # 指定 C++ 标准版本（C++17）
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-#set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # 设置编译选项
 if(MSVC)
-    # MSVC 编译器选项
     add_compile_options(
-        /W4                     # 启用警告级别4
-        #/WX                     # 将警告视为错误
-        /EHsc                   # 启用标准异常处理
-        /utf-8                  # 使用UTF-8编码
+        /W4
+        /EHsc
+        /utf-8
     )
 else()
-    # GCC/Clang 编译器选项
     add_compile_options(
-        -Wall                   # 启用所有警告
-        -Wextra                 # 启用额外警告
-        #-Werror                 # 将警告视为错误
-        -pedantic               # 启用严格标准检查
+        -Wall
+        -Wextra
+        -pedantic
     )
 endif()
 
 # 包含头文件目录
-# include_directories(
-#     ${PROJECT_SOURCE_DIR}         
-#     ${PROJECT_SOURCE_DIR}/..
-#     ${PROJECT_SOURCE_DIR}/../include
-    
-# )
+include_directories(
+    ${CMAKE_SOURCE_DIR}/../include
+)
 
-# # 添加连接池库的源文件
-# set(
-    
-# )
+set(SOURCES
+    ${PROJECT_SOURCE_DIR}/../src/broker.cpp
+    ${PROJECT_SOURCE_DIR}/../src/channelPool.cpp
+    ${PROJECT_SOURCE_DIR}/../src/channelGuard.cpp
+    ${PROJECT_SOURCE_DIR}/../src/channel.cpp
+    ${PROJECT_SOURCE_DIR}/../src/connection.cpp
+    ${PROJECT_SOURCE_DIR}/../src/consumer.cpp
+    ${PROJECT_SOURCE_DIR}/../src/exchange.cpp
+    ${PROJECT_SOURCE_DIR}/../src/message.cpp
+    ${PROJECT_SOURCE_DIR}/../src/producer.cpp
+    ${PROJECT_SOURCE_DIR}/../src/queue.cpp
+)
 
-# 添加测试目标
-add_executable(test_send send.cpp)
-add_executable(test_recv recv.cpp)
+# 添加示例目标
+add_executable(test_send send.cpp ${SOURCES})
+add_executable(test_recv recv.cpp ${SOURCES})
 
 
 target_link_libraries(test_send rabbitmq)
